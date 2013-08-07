@@ -29,7 +29,10 @@ nosetests.xml
 # Translations
 *.mo
 
-# Mr Developer
-.mr.developer.cfg
-.project
-.pydevproject
+# Mac
+.DS_Store
+
+# Clawpack data files
+*.data
+*.tt2
+*.xyzt
