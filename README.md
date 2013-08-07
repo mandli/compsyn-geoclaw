@@ -1,4 +1,4 @@
-compsyn-geoclaw
-===============
+COMPSYN/GeoClaw Coupling
+========================
 
-Coupling between the COMPSYN siesmo package and the shallow water solver GeoClaw
+Coupling between the COMPSYN siesmo package and the shallow water solver GeoClaw.
