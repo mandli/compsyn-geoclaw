@@ -64,17 +64,16 @@ def setrun(claw_pkg='geoclaw'):
     clawdata.num_dim = num_dim
 
     # Lower and upper edge of computational domain:
-    clawdata.lower[0] = -120.0      # west longitude
-    clawdata.upper[0] = -60.0       # east longitude
+    clawdata.lower[0] = -118.0      # west longitude
+    clawdata.upper[0] = -86.0       # east longitude
 
-    clawdata.lower[1] = -60.0       # south latitude
-    clawdata.upper[1] = 0.0         # north latitude
-
+    clawdata.lower[1] = 7.0          # south latitude
+    clawdata.upper[1] = 21.0         # north latitude
 
 
     # Number of grid cells: Coarsest grid
-    clawdata.num_cells[0] = 30
-    clawdata.num_cells[1] = 30
+    clawdata.num_cells[0] = 32
+    clawdata.num_cells[1] = 14
 
     # ---------------
     # Size of system:
@@ -347,15 +346,14 @@ def setrun(claw_pkg='geoclaw'):
     rundata.regiondata.regions = []
     # to specify regions of refinement append lines of the form
     #  [minlevel,maxlevel,t1,t2,x1,x2,y1,y2]
-    rundata.regiondata.regions.append([3, 3, 0., 10000., -85,-72,-38,-25])
-    rundata.regiondata.regions.append([3, 3, 8000., 26000., -90,-80,-30,-15])
+    # rundata.regiondata.regions.append([3, 3, 0., 10000., -85,-72,-38,-25])
 
     # ---------------
     # Gauges:
     # ---------------
     rundata.gaugedata.gauges = []
     # for gauges append lines of the form  [gaugeno, x, y, t1, t2]
-    rundata.gaugedata.gauges.append([32412, -86.392, -17.975, 0., 1.e10])
+    # rundata.gaugedata.gauges.append([32412, -86.392, -17.975, 0., 1.e10])
     
 
     return rundata
@@ -403,13 +401,24 @@ def setgeo(rundata):
     topo_data = rundata.topo_data
     # for topography, append lines of the form
     #    [topotype, minlevel, maxlevel, t1, t2, fname]
-    topo_data.topofiles.append([2, 1, 3, 0., 1.e10, 'etopo10min120W60W60S0S.asc'])
+    topo_data.topofiles.append([2, 1, 3, 0., 1.e10, 
+                                           './bathy/mexican_coast_pacific.tt2'])
 
     # == setdtopo.data values ==
     dtopo_data = rundata.dtopo_data
     # for moving topography, append lines of the form :   (<= 1 allowed for now!)
-    #   [topotype, minlevel,maxlevel,fname]
-    dtopo_data.dtopofiles.append([1,3,3,'usgs100227.tt1'])
+    #   [topotype, minlevel,maxlevel,fname] 
+    # Vertical component considering homogeneous slip on the entire fault
+    dtopo_data.dtopofiles.append([4,3,3,'bathy/gapThzi.xyzt'])
+    # Magnitude (considering the 3 components) for homogeneous slip on the 
+    # entire fault
+    # dtopo_data.dtopofiles.append([4,3,3,'bathy/gapThi.xyzt'])
+    # Magnitude (considering the 3 components) for stochastic slip on the entire
+    # fault.
+    # dtopo_data.dtopofiles.append([4,3,3,'bathy/gapvTi.xyzt'])
+    # Vertical component considering stochastic slip on the entire fault (slide 
+    # 4 in the pptx file I sent you in my previous e-mail)
+    # dtopo_data.dtopofiles.append([4,3,3,'bathy/gapvTzi.xyzt'])
 
 
     # == setqinit.data values ==
