@@ -51,11 +51,11 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         base_url = sys.argv[1]
 
-    urls = [os.path.join(base_url, 'mexican_coast_pacific.tt2'),
-            os.path.join(base_url, 'gapThi.xyzt.gz'),
-            os.path.join(base_url, 'gapvTi.xyzt.gz'),
-            os.path.join(base_url, 'gapThzi.xyzt.gz'),
-            os.path.join(base_url, 'gapvTzi.xyzt.gz')]
+    urls = [os.path.join(base_url, 'mexican_coast_pacific.tt3'),
+            os.path.join(base_url, 'gapTh.xyzt'),
+            os.path.join(base_url, 'gapvT.xyzt'),
+            os.path.join(base_url, 'gapThz.xyzt'),
+            os.path.join(base_url, 'gapvTz.xyzt')]
 
     for url in urls:
         get_bathy(url)

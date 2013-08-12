@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 """
 Module to set up run time parameters for Clawpack.
 
@@ -401,24 +403,24 @@ def setgeo(rundata):
     topo_data = rundata.topo_data
     # for topography, append lines of the form
     #    [topotype, minlevel, maxlevel, t1, t2, fname]
-    topo_data.topofiles.append([2, 1, 3, 0., 1.e10, 
-                                           './bathy/mexican_coast_pacific.tt2'])
+    topo_data.topofiles.append([3, 1, 3, 0., 1.e10, 
+                                           './bathy/mexican_coast_pacific.tt3'])
 
     # == setdtopo.data values ==
     dtopo_data = rundata.dtopo_data
     # for moving topography, append lines of the form :   (<= 1 allowed for now!)
     #   [topotype, minlevel,maxlevel,fname] 
     # Vertical component considering homogeneous slip on the entire fault
-    dtopo_data.dtopofiles.append([4,3,3,'bathy/gapThzi.xyzt'])
+    dtopo_data.dtopofiles.append([4,3,3,'bathy/rot_gapTh.xyzt'])
     # Magnitude (considering the 3 components) for homogeneous slip on the 
     # entire fault
-    # dtopo_data.dtopofiles.append([4,3,3,'bathy/gapThi.xyzt'])
+    # dtopo_data.dtopofiles.append([4,3,3,'bathy/gapTh.xyzt'])
     # Magnitude (considering the 3 components) for stochastic slip on the entire
     # fault.
-    # dtopo_data.dtopofiles.append([4,3,3,'bathy/gapvTi.xyzt'])
+    # dtopo_data.dtopofiles.append([4,3,3,'bathy/gapvT.xyzt'])
     # Vertical component considering stochastic slip on the entire fault (slide 
     # 4 in the pptx file I sent you in my previous e-mail)
-    # dtopo_data.dtopofiles.append([4,3,3,'bathy/gapvTzi.xyzt'])
+    # dtopo_data.dtopofiles.append([4,3,3,'bathy/gapvTz.xyzt'])
 
 
     # == setqinit.data values ==

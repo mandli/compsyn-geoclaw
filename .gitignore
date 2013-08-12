@@ -34,5 +34,5 @@ nosetests.xml
 
 # Clawpack data files
 *.data
-*.tt2
+*.tt3
 *.xyzt
