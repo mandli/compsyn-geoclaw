@@ -37,6 +37,7 @@ def transform_deformation_file(path, out_path='./', t_start=0.0, dt=5.0,
     num_dim = 2
 
     # Read in data from original deformation file
+    print "Loading data from %s" % path
     data = numpy.loadtxt(path)
 
     # Extract data arrays
@@ -71,7 +72,9 @@ def transform_deformation_file(path, out_path='./', t_start=0.0, dt=5.0,
         axes.pcolor(X, Y, Z[:,:,debug_frame])
         axes.set_aspect('equal')
 
-    # # Construct new grid
+    print "Done reading in data."
+
+    # Construct new grid
     new_num_cells = []
     for dim in xrange(2):
         new_num_cells.append(int(scaling * num_cells[dim]))
@@ -81,6 +84,7 @@ def transform_deformation_file(path, out_path='./', t_start=0.0, dt=5.0,
     Z_new = numpy.zeros((new_num_cells[1], new_num_cells[0], data.shape[1] - 2))
 
     # Construct each interpolating function and evaluate at new grid
+    print "Writing out new deformation file rot_%s" % os.path.basename(path)
     output_file = os.path.join(out_path, "rot_%s" % os.path.basename(path))
     try:
         file_handle = open(output_file, 'w')
@@ -90,7 +94,7 @@ def transform_deformation_file(path, out_path='./', t_start=0.0, dt=5.0,
                                                     method='linear', fill_value=0.0)
 
             # Write out new gridded file
-            t = t_start + n * dt
+            t = t_start + n * dt:
             write_deformation_to_file(t, X_new, Y_new, Z_new[:,:,n], file_handle)
         file_handle.close()
     except IOError as e:
@@ -106,10 +110,11 @@ def transform_deformation_file(path, out_path='./', t_start=0.0, dt=5.0,
         fig.colorbar(plot)
 
         plt.show()
+    print "Done writing out deformation file."
 
 
 if __name__ == "__main__":
-    file_list = glob.glob('./*.xyzt')
+    file_list = glob.glob('./gap*.xyzt')
     if len(sys.argv) > 1:
         file_list = sys.argv[1:]
     for deformation_file in file_list:
