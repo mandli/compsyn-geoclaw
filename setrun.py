@@ -411,16 +411,16 @@ def setgeo(rundata):
     # for moving topography, append lines of the form :   (<= 1 allowed for now!)
     #   [topotype, minlevel,maxlevel,fname] 
     # Vertical component considering homogeneous slip on the entire fault
-    dtopo_data.dtopofiles.append([1,3,3,'bathy/rot_gapTh.xyzt'])
+    dtopo_data.dtopofiles.append([1,3,3,'bathy/rot_gapThz.xyzt'])
     # Magnitude (considering the 3 components) for homogeneous slip on the 
     # entire fault
-    # dtopo_data.dtopofiles.append([4,3,3,'bathy/gapTh.xyzt'])
+    #dtopo_data.dtopofiles.append([1,3,3,'bathy/rot_gapTh.xyzt'])
     # Magnitude (considering the 3 components) for stochastic slip on the entire
     # fault.
-    # dtopo_data.dtopofiles.append([4,3,3,'bathy/gapvT.xyzt'])
+    #dtopo_data.dtopofiles.append([1,3,3,'bathy/rot_gapvT.xyzt'])
     # Vertical component considering stochastic slip on the entire fault (slide 
     # 4 in the pptx file I sent you in my previous e-mail)
-    # dtopo_data.dtopofiles.append([4,3,3,'bathy/gapvTz.xyzt'])
+    #dtopo_data.dtopofiles.append([1,3,3,'bathy/rot_gapvTz.xyzt'])
 
 
     # == setqinit.data values ==
