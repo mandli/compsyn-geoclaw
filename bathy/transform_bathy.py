@@ -2,6 +2,7 @@
 
 import os
 import sys
+import glob
 
 import numpy
 import scipy.interpolate as interp
@@ -108,4 +109,8 @@ def transform_deformation_file(path, out_path='./', t_start=0.0, dt=5.0,
 
 
 if __name__ == "__main__":
-    transform_deformation_file('./gapTh.xyzt', scaling=4.0)
+    file_list = glob.glob('./*.xyzt')
+    if len(sys.argv) > 1:
+        file_list = sys.argv[1:]
+    for deformation_file in file_list:
+        transform_deformation_file(deformation_file, scaling=4.0)
