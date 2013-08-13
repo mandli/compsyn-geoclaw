@@ -10,8 +10,9 @@ function setplot is called to set the plot parameters.
 import numpy as np
 import matplotlib.pyplot as plt
 
-from clawpack.geoclaw import topotools
-from clawpack.clawutil import clawdata
+from clawpack.visclaw import geoplot
+import clawpack.clawutil.data as clawdata
+
 
 # try:
 #     from setplotfg import setplotfg
@@ -30,12 +31,12 @@ def setplot(plotdata):
     
     """ 
 
-
-    from clawpack.visclaw import colormaps, geoplot
-    from numpy import linspace
-
     plotdata.clearfigures()  # clear any old figures,axes,items data
 
+    data = clawdata.ClawInputData(2)
+    data.read('./claw.data')
+    xlimits = (data.lower[0], data.upper[0])
+    ylimits = (data.lower[1], data.upper[1])
 
     # To plot gauge locations on pcolor or contour plot, use this as
     # an afteraxis function:
@@ -118,14 +119,14 @@ def setplot(plotdata):
     plotitem.add_colorbar = False
     plotitem.amr_celledges_show = [1,1,0]
     plotitem.patchedges_show = 1
-    plotaxes.xlimits = [-120,-60]
-    plotaxes.ylimits = [-60,0]
+    plotaxes.xlimits = xlimits
+    plotaxes.ylimits = ylimits
 
     # add contour lines of bathy if desired:
     plotitem = plotaxes.new_plotitem(plot_type='2d_contour')
     plotitem.show = False
     plotitem.plot_var = geoplot.topo
-    plotitem.contour_levels = linspace(-3000,-3000,1)
+    plotitem.contour_levels = np.linspace(-3000,-3000,1)
     plotitem.amr_contour_colors = ['y']  # color on each level
     plotitem.kwargs = {'linestyles':'solid','linewidths':2}
     plotitem.amr_contour_show = [1,0,0]  
@@ -171,8 +172,8 @@ def setplot(plotdata):
     plotitem.add_colorbar = False
     plotitem.amr_celledges_show = [1,1,0]
     plotitem.patchedges_show = 1
-    plotaxes.xlimits = [-120,-60]
-    plotaxes.ylimits = [-60,0]
+    plotaxes.xlimits = xlimits
+    plotaxes.ylimits = ylimits
 
 
     #-----------------------------------------
