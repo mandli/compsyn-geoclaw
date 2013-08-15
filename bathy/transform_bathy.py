@@ -100,6 +100,7 @@ def transform_deformation_file(path, out_path='./', t_start=0.0, dt=5.0,
             # Project onto rotated grid
             Z_new[:,:,n] = interp.griddata(longlat_coords, z[:,n], (X_new, Y_new), 
                                                     method='linear', fill_value=0.0)
+            Z_new[:,:,n] *= 0.1
 
             # Write out new gridded file
             t = t_start + n * dt
