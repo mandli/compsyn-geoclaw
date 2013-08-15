@@ -24,12 +24,20 @@ def transform_coords(x, y):
     return longitude, latitude
 
 
-def write_deformation_to_file(t, X, Y, Z, outfile):
+def write_deformation_to_file(t, X, Y, Z, outfile, topo_type=1):
     r"""Write out a dtopo file"""
 
-    for i in xrange(X.shape[1]):
+    if topo_type == 1:
+        Y_flipped = numpy.flipud(Y)
+        Z_flipped = numpy.flipud(Z)
         for j in xrange(Y.shape[0]):
-            outfile.write("%s %s %s %s\n" % (t, X[j,i],Y[j,i],Z[j,i]))
+            for i in xrange(X.shape[1]):
+                outfile.write("%s %s %s %s\n" % (t, X[j,i], Y_flipped[j,i], Z_flipped[j,i]))
+    elif topo_type == 2 or topo_type == 3:
+        raise NotImplementedError("Topography types 2 and 3 are not yet supported.")
+    else:
+        raise ValueError("Only topography types 1, 2, and 3 are supported.")
+
 
 def transform_deformation_file(path, out_path='./', t_start=0.0, dt=5.0, 
                                       scaling=1.0, debug=False, debug_frame=25):
@@ -94,7 +102,7 @@ def transform_deformation_file(path, out_path='./', t_start=0.0, dt=5.0,
                                                     method='linear', fill_value=0.0)
 
             # Write out new gridded file
-            t = t_start + n * dt:
+            t = t_start + n * dt
             write_deformation_to_file(t, X_new, Y_new, Z_new[:,:,n], file_handle)
         file_handle.close()
     except IOError as e:
