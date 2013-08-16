@@ -8,14 +8,18 @@ import numpy
 import scipy.interpolate as interp
 import matplotlib.pyplot as plt
 
-import clawpack.geoclaw.topotools as topotools
+def transform_coords(x, y, strike=22.0):
+    r"""Transform coordinates from local fault coordinates to long-lat
 
-def transform_coords(x, y):
+    TODO: Add more parameters so that this function can be generalized to any
+    fault setup.  Also want to make this an input to the *read_compsys_file*
+    function.
+    """
     # Rotate
-    longitude = (x + 180.0) * numpy.cos(22.0 * numpy.pi / 180.0) \
-              + (y + 60.00) * numpy.sin(22.0 * numpy.pi / 180.0)
-    latitude  = -(x + 180.0) * numpy.sin(22.0 * numpy.pi / 180.0) \
-              +  (y + 60.00) * numpy.cos(22.0 * numpy.pi / 180.0)
+    longitude = (x + 180.0) * numpy.cos(strike * numpy.pi / 180.0) \
+              + (y + 60.00) * numpy.sin(strike * numpy.pi / 180.0)
+    latitude  = -(x + 180.0) * numpy.sin(strike * numpy.pi / 180.0) \
+              +  (y + 60.00) * numpy.cos(strike * numpy.pi / 180.0)
 
     # Transform to lat-long
     longitude = (longitude / 106.0) - 102.3
@@ -24,34 +28,45 @@ def transform_coords(x, y):
     return longitude, latitude
 
 
-def write_deformation_to_file(t, X, Y, Z, outfile, topo_type=1):
-    r"""Write out a dtopo file"""
+def read_compsys_file(path, transform_coords):
+    r"""Read a COMPSYS generated deformation file
 
-    if topo_type == 1:
-        Y_flipped = numpy.flipud(Y)
-        Z_flipped = numpy.flipud(Z)
-        for j in xrange(Y.shape[0]):
-            for i in xrange(X.shape[1]):
-                outfile.write("%s %s %s %s\n" % (t, X[j,i], Y_flipped[j,i], Z_flipped[j,i]))
-    elif topo_type == 2 or topo_type == 3:
-        raise NotImplementedError("Topography types 2 and 3 are not yet supported.")
-    else:
-        raise ValueError("Only topography types 1, 2, and 3 are supported.")
+    Returns array of long lat tuples and Z array.  If X, Y arrays for plotting 
+    are desired than use
+    ```
+    X = longlat_coords[0].reshape((num_cells[1], num_cells[0]))
+    Y = longlat_coords[1].reshape((num_cells[1], num_cells[0]))
+    Z = numpy.zeros((num_cells[1], num_cells[0], num_cells[2]))
+    for n in xrange(num_cells[2]):
+        Z[:,:,n] = z[:,n].reshape((num_cells[1], num_cells[0]))
+    ```
+    to get the correct shapes.
 
+    input
+    -----
+     - *path* (path) - Path to COMPSYS deformation file.
+     - *transform_coords (func) - Function that will perform the coordinate
+       transformation from local fault coordinates (meters) to lat-long.
 
-def transform_deformation_file(path, out_path='./', t_start=0.0, dt=5.0, 
-                                      scaling=1.0, debug=False, debug_frame=25):
+    output
+    ------
+     - *num_cells* (list) - Dimensions of the data in the x, y, and t dimensions
+     - *longlat_coords* (list) - List of numpy.ndarrays containing the new
+       transformed coordinates.
+     - *z* (numpy.ndarray[:,:]) - Flattened array containing deformation data.
+       The first indice is spatial and the second temporal, i.e. 
+       *z.shape = (num_cells[0] * num_cells[1], num_cells[2])*
 
-    num_dim = 2
+    """
 
-    # Read in data from original deformation file
+    # Read in data from COMPSYS deformation file
     print "Loading data from %s" % path
     data = numpy.loadtxt(path)
 
     # Extract data arrays
     x = data[:,0]
     y = data[:,1]
-    z = data[:,num_dim:]
+    z = data[:,2:]
 
     # Transform (x,y) -> (long,lat)
     longlat_coords = transform_coords(x, y)
@@ -60,71 +75,189 @@ def transform_deformation_file(path, out_path='./', t_start=0.0, dt=5.0,
     for i in xrange(1, data.shape[0]):
         if data[i,0] == data[0,0]:
             break
-    num_cells = [0, 0]
-    num_cells[0] = i
-    num_cells[1] = int(data.shape[0] / num_cells[0])
+    num_cells = [i, int(data.shape[0] / i), data.shape[1] - 2]
     if num_cells[0] * num_cells[1] != data.shape[0]:
         raise ValueError("Error in calculating extents.")
 
-    if debug:
-        # Rearrange input data to sanity
-        X = longlat_coords[0].reshape((num_cells[1], num_cells[0]))
-        Y = longlat_coords[1].reshape((num_cells[1], num_cells[0]))
-        Z = numpy.zeros((num_cells[1], num_cells[0], data.shape[1] - 2))
-        for n in xrange(data.shape[1] - num_dim):
-            Z[:,:,n] = z[:,n].reshape((num_cells[1], num_cells[0]))
-
-        # Plot original data in lat-long coordinates
-        fig = plt.figure()
-        axes = fig.add_subplot(121)
-        axes.pcolor(X, Y, Z[:,:,debug_frame])
-        axes.set_aspect('equal')
-
     print "Done reading in data."
+
+    return num_cells, longlat_coords, z
+
+
+def project_deformation(num_cells, longlat_coords, z, t_start=0.0, dt=5.0, 
+                        scaling=1.0):
+    r"""Project the input deformation onto a grid aligned with lat-long
+
+    Given an array of coordinates *longlat_coords*, deformations *z* and the 
+    number of cells in longitude, latitude and time project onto a grid that
+    with coordinates aligned with longitude and latitude.  The time vector *t*
+    that is returned is calculated via *t_start* and *dt*.
+
+    input
+    -----
+     - *num_cells*
+     - *longlat_coords*
+     - *z*
+     - *t_start*
+     - *dt*
+     - *scaling*
+
+    output
+    ------
+     - *t* (numpy.ndarray[num_cells[2]]) - Array containing times which the
+       deformation array *Z* has.
+     - *X* (numpy.ndarray[:,:]) - Array containing x (longitude) coordinates as 
+       would be given back by *numpy.meshgrid*.
+     - *Y* (numpy.ndarray[:,:]) - Array containing y (latitude) coordinates as 
+       would be given back by *numpy.meshgrid*.
+     - *Z* (numpy.ndarray[:,:,:]) - Array containing deformation information at
+       each time in *t*.
+
+    """
 
     # Construct new grid
     new_num_cells = []
-    for dim in xrange(2):
-        new_num_cells.append(int(scaling * num_cells[dim]))
+    new_num_cells.append(int(scaling * num_cells[1]))
+    new_num_cells.append(int(scaling * num_cells[0]))
     x_new = numpy.linspace(numpy.min(longlat_coords[0]), numpy.max(longlat_coords[0]), new_num_cells[0])
     y_new = numpy.linspace(numpy.min(longlat_coords[1]), numpy.max(longlat_coords[1]), new_num_cells[1])
     X_new, Y_new = numpy.meshgrid(x_new, y_new)
-    Z_new = numpy.zeros((new_num_cells[1], new_num_cells[0], data.shape[1] - 2))
+    Z_new = numpy.zeros((new_num_cells[1], new_num_cells[0], num_cells[2]))
+    t = numpy.arange(t_start, num_cells[2] * dt, dt)
 
     # Construct each interpolating function and evaluate at new grid
-    print "Writing out new deformation file rot_%s" % os.path.basename(path)
-    output_file = os.path.join(out_path, "rot_%s" % os.path.basename(path))
+    for n in xrange(num_cells[2]):
+        # Project onto rotated grid
+        Z_new[:,:,n] = interp.griddata(longlat_coords, z[:,n], (X_new, Y_new), 
+                                                method='linear', fill_value=0.0)
+        Z_new[:,:,n] *= 0.1
+
+    return t, X_new, Y_new, Z_new
+
+
+def write_deformation_to_file(t, X, Y, Z, output_file, topo_type=1):
+    r"""Write out a dtopo file to *output_file*
+
+    input
+    -----
+     - *t* (numpy.ndarray[:]) - Array containing time points, note that 
+       *t.shape[0] == Z.shape[2]*.
+     - *X* (numpy.ndarray[:,:]) - Array containing x-coodinates (longitude), 
+       should be in the form given by *numpy.meshgrid*.
+     - *Y* (numpy.ndarray[:,:]) - Array containing y-coordinates (latitude),
+       should be in the form given by *numpy.meshgrid*.
+     - *Z* (numpy.ndarray[:,:,:]) - Array containing deformation from original
+       bathymetry.
+     - *output_file* (path) - Path to the output file to written to.
+     - *topo_type* (int) - Type of topography file to write out.  Default is 1.
+
+    """
+
+    # Temporary catch for non implemented topo_type input
+    if topo_type != 1:
+        raise NotImplementedError("Topography types 2 and 3 are not yet supported.")
+
+    # Construct each interpolating function and evaluate at new grid
     try:
         file_handle = open(output_file, 'w')
-        for n in xrange(data.shape[1] - 2):
-            # Project onto rotated grid
-            Z_new[:,:,n] = interp.griddata(longlat_coords, z[:,n], (X_new, Y_new), 
-                                                    method='linear', fill_value=0.0)
-            Z_new[:,:,n] *= 0.1
 
-            # Write out new gridded file
-            t = t_start + n * dt
-            write_deformation_to_file(t, X_new, Y_new, Z_new[:,:,n], file_handle)
-        file_handle.close()
+        if topo_type == 1:
+            # Topography file with 4 columns, t, x, y, dz written from the upper
+            # left corner of the region
+            Y_flipped = numpy.flipud(Y)
+            for n in xrange(t.shape[0]):
+                Z_flipped = numpy.flipud(Z[:,:,n])
+                for j in xrange(Y.shape[0]):
+                    for i in xrange(X.shape[1]):
+                        outfile.write("%s %s %s %s\n" % (t[n], X[j,i], Y_flipped[j,i], Z_flipped[j,i]))
+    
+        elif topo_type == 2 or topo_type == 3:
+            raise NotImplementedError("Topography types 2 and 3 are not yet supported.")
+        else:
+            raise ValueError("Only topography types 1, 2, and 3 are supported.")
+
     except IOError as e:
         raise e
     finally:
         file_handle.close()
 
-    # Plot rotation if requested
-    if debug:
-        axes = fig.add_subplot(122)
-        plot = axes.pcolor(X_new, Y_new, Z_new[:,:,debug_frame])
-        axes.set_aspect('equal')
-        fig.colorbar(plot)
 
-        plt.show()
-    print "Done writing out deformation file."
+def plot_deformation_comparison(path, frames='all'):
+    r"""Plot deformation comparisons between original COMPSYS file and rotated
+
+    input
+    -----
+     - *path* (path) - Path to COMPSYS deformation file
+     - *frames* (list or string) - List of time frames to plot or keyword 'all'
+       to plot all available frames.  Default is 'all'.
+
+    output
+    ------
+     - (matplotlib.pyplot.figure) - Figure containing all plots.
+    """
+
+    # Read in data from original deformation file
+    num_cells, longlat_coords, z = read_compsys_file(path)
+
+    # Put data into correct shapes
+    X = longlat_coords[0].reshape((num_cells[1], num_cells[0]))
+    Y = longlat_coords[1].reshape((num_cells[1], num_cells[0]))
+    Z = numpy.zeros((num_cells[1], num_cells[0], num_cells[2]))
+    for n in xrange(num_cells[2]):
+        Z[:,:,n] = z[:,n].reshape((num_cells[1], num_cells[0]))
+
+    # Transform to new arrays
+    t, X_new, Y_new, Z_new =        \
+                        transform_deformation_file(num_cells, longlat_coords, z,
+                                                    scaling=4.0)
+
+    # Create frames list if not given or 'all' is used
+    if frames is None or frames == 'all':
+        frames = range(num_cells[2])
+
+    # Plot original and transformed next to each other
+    fig = plt.figure()
+    fig.suptitle('Deformation for %s' % os.path.basename(path))
+    for (n,frame) in enumerate(frames):
+        # Plot original data in lat-long coordinates
+        axes = fig.add_subplot(len(frames), 2, 2 * n + 1)
+        axes.pcolor(X, Y, Z[:,:,frame])
+        axes.set_aspect('equal')
+
+        axes = fig.add_subplot(len(frames),2, 2 * n + 2)
+        axes.pcolor(X_new, Y_new, Z_new[:,:,frame])
+        axes.set_aspect('equal')
+
+    return fig
 
 
 if __name__ == "__main__":
-    file_list = glob.glob('./gap*.xyzt')
+    # Simple command line parsing
+    command = 'plot'
+    file_list = 'all'
     if len(sys.argv) > 1:
-        file_list = sys.argv[1:]
-    for deformation_file in file_list:
-        transform_deformation_file(deformation_file, scaling=4.0)
+        command = sys.argv[1]
+        if len(sys.argv) > 2:
+            file_list = sys.argv[2:]
+    if file_list == 'all':
+        file_list = glob.glob('./gap*.xyzt')
+
+    # Execute approrpiate command
+    if command == 'plot':
+        for deformation_file in file_list:
+            plot_deformation_comparison(deformation_file, frames=[0,25,49])
+        plt.show()
+    elif command == 'transform':
+        for deformation_file in file_list:
+            # Transform grid
+            t, X, Y, Z = transform_deformation_file(deformation_file, scaling=4.0)
+            
+            # Write out new grid
+            prefix = 'rot'
+            out_path = os.getcwd()
+            print "Writing out new deformation file %s_%s" % (prefix, os.path.basename(deformation_file))
+            output_file = os.path.join(out_path, "%s_%s" % (prefix, os.path.basename(deformation_file)))
+            write_deformation_to_file(t, X, Y, Z, output_file)
+            print "Done writing out deformation file."
+    else:
+        raise ValueError("Invalid command, use 'plot' or 'transform'")
