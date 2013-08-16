@@ -117,17 +117,24 @@ def setrun(claw_pkg='geoclaw'):
     # Note that the time integration stops after the final output time.
     # The solution at initial time t0 is always written in addition.
 
-    clawdata.output_style = 1
+    clawdata.output_style = 2
 
     if clawdata.output_style==1:
         # Output nout frames at equally spaced times up to tfinal:
-        clawdata.num_output_times = 18
-        clawdata.tfinal = 32400.0
+        hours = 4
+        output_per_hour = 2
+        clawdata.num_output_times = hours * output_per_hour
+        clawdata.tfinal = float(hours) * 3600.0
         clawdata.output_t0 = True  # output at initial (or restart) time?
 
     elif clawdata.output_style == 2:
         # Specify a list of output times.
-        clawdata.output_times = [0.5, 1.0]
+        hours = 4
+        output_per_hour = 2
+        dt = 3600.0 / output_per_hour
+        clawdata.output_times = [0.0, 125.0, 250.0]
+        for n in xrange(1, hours * output_per_hour + 1):
+            clawdata.output_times.append(clawdata.t0 + n * dt)
 
     elif clawdata.output_style == 3:
         # Output every iout timesteps with a total of ntot time steps:
@@ -355,7 +362,7 @@ def setrun(claw_pkg='geoclaw'):
     # ---------------
     rundata.gaugedata.gauges = []
     # for gauges append lines of the form  [gaugeno, x, y, t1, t2]
-    # rundata.gaugedata.gauges.append([32412, -86.392, -17.975, 0., 1.e10])
+    rundata.gaugedata.gauges.append([1, -105, 14.0, 0., 1.e10])
     
 
     return rundata
@@ -414,13 +421,13 @@ def setgeo(rundata):
     dtopo_data.dtopofiles.append([1,3,3,'bathy/rot_gapThz.xyzt'])
     # Magnitude (considering the 3 components) for homogeneous slip on the 
     # entire fault
-    #dtopo_data.dtopofiles.append([1,3,3,'bathy/rot_gapTh.xyzt'])
+    # dtopo_data.dtopofiles.append([1,3,3,'bathy/rot_gapTh.xyzt'])
     # Magnitude (considering the 3 components) for stochastic slip on the entire
     # fault.
-    #dtopo_data.dtopofiles.append([1,3,3,'bathy/rot_gapvT.xyzt'])
+    # dtopo_data.dtopofiles.append([1,3,3,'bathy/rot_gapvT.xyzt'])
     # Vertical component considering stochastic slip on the entire fault (slide 
     # 4 in the pptx file I sent you in my previous e-mail)
-    #dtopo_data.dtopofiles.append([1,3,3,'bathy/rot_gapvTz.xyzt'])
+    # dtopo_data.dtopofiles.append([1,3,3,'bathy/rot_gapvTz.xyzt'])
 
 
     # == setqinit.data values ==
