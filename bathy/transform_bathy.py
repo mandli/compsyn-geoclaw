@@ -159,7 +159,7 @@ def write_deformation_to_file(t, X, Y, Z, output_file, topo_type=1):
 
     # Construct each interpolating function and evaluate at new grid
     try:
-        file_handle = open(output_file, 'w')
+        outfile = open(output_file, 'w')
 
         if topo_type == 1:
             # Topography file with 4 columns, t, x, y, dz written from the upper
@@ -179,7 +179,7 @@ def write_deformation_to_file(t, X, Y, Z, output_file, topo_type=1):
     except IOError as e:
         raise e
     finally:
-        file_handle.close()
+        outfile.close()
 
 
 def plot_deformation_comparison(path, frames='all'):
@@ -233,7 +233,7 @@ def plot_deformation_comparison(path, frames='all'):
 
 if __name__ == "__main__":
     # Simple command line parsing
-    command = 'plot'
+    command = 'transform'
     file_list = 'all'
     if len(sys.argv) > 1:
         command = sys.argv[1]
@@ -249,8 +249,13 @@ if __name__ == "__main__":
         plt.show()
     elif command == 'transform':
         for deformation_file in file_list:
-            # Transform grid
-            t, X, Y, Z = transform_deformation_file(deformation_file, scaling=4.0)
+            # Read and transform deformation file
+            num_cells, longlat_coords, z = read_compsys_file(deformation_file,
+                                                             transform_coords)
+
+            # Project deformation into lat-long coordinates
+            t, X, Y, Z = project_deformation(num_cells, longlat_coords, z,
+                                             scaling=4.0)
             
             # Write out new grid
             prefix = 'rot'
