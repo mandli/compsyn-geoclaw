@@ -37,6 +37,10 @@ def setplot(plotdata):
     data.read('./claw.data')
     xlimits = (data.lower[0], data.upper[0])
     ylimits = (data.lower[1], data.upper[1])
+    xlimits_zoom = (-105.0, -98.0)
+    ylimits_zoom = (15.0, 18.0)
+    surface_limit = 2.0
+    speed_limit = 1.0
 
     # To plot gauge locations on pcolor or contour plot, use this as
     # an afteraxis function:
@@ -104,8 +108,8 @@ def setplot(plotdata):
     # plotitem.plot_var = geoplot.surface
     plotitem.plot_var = geoplot.surface_or_depth
     plotitem.pcolor_cmap = geoplot.tsunami_colormap
-    plotitem.pcolor_cmin = -0.2e0
-    plotitem.pcolor_cmax = 0.2e0
+    plotitem.pcolor_cmin = -surface_limit
+    plotitem.pcolor_cmax = surface_limit
     plotitem.add_colorbar = True
     plotitem.amr_celledges_show = [0,0,0]
     plotitem.patchedges_show = 1
@@ -134,9 +138,64 @@ def setplot(plotdata):
     plotitem.patchedges_show = 0
 
     #-----------------------------------------
+    # Zoom in of shore
+    #-----------------------------------------
+    plotfigure = plotdata.new_plotfigure(name='Surface Zoom', figno=1)
+
+    # Set up for axes in this figure:
+    plotaxes = plotfigure.new_plotaxes('pcolor')
+    plotaxes.title = 'Surface'
+    plotaxes.scaled = True
+
+    def fixup(current_data):
+        import pylab
+        addgauges(current_data)
+        t = current_data.t
+        t = t / 3600.  # hours
+        pylab.title('Surface at %4.2f hours' % t, fontsize=20)
+        pylab.xticks(fontsize=15)
+        pylab.yticks(fontsize=15)
+    plotaxes.afteraxes = fixup
+
+    # Water
+    plotitem = plotaxes.new_plotitem(plot_type='2d_pcolor')
+    # plotitem.plot_var = geoplot.surface
+    plotitem.plot_var = geoplot.surface_or_depth
+    plotitem.pcolor_cmap = geoplot.tsunami_colormap
+    plotitem.pcolor_cmin = -surface_limit
+    plotitem.pcolor_cmax = surface_limit
+    plotitem.add_colorbar = True
+    plotitem.amr_celledges_show = [0,0,0]
+    plotitem.patchedges_show = 1
+
+    # Land
+    plotitem = plotaxes.new_plotitem(plot_type='2d_pcolor')
+    plotitem.plot_var = geoplot.land
+    plotitem.pcolor_cmap = geoplot.land_colors
+    plotitem.pcolor_cmin = 0.0
+    plotitem.pcolor_cmax = 100.0
+    plotitem.add_colorbar = False
+    plotitem.amr_celledges_show = [1,1,0]
+    plotitem.patchedges_show = 1
+    plotaxes.xlimits = xlimits_zoom
+    plotaxes.ylimits = ylimits_zoom
+
+    # add contour lines of bathy if desired:
+    plotitem = plotaxes.new_plotitem(plot_type='2d_contour')
+    plotitem.show = False
+    plotitem.plot_var = geoplot.topo
+    plotitem.contour_levels = np.linspace(-3000,-3000,1)
+    plotitem.amr_contour_colors = ['y']  # color on each level
+    plotitem.kwargs = {'linestyles':'solid','linewidths':2}
+    plotitem.amr_contour_show = [1,0,0]  
+    plotitem.celledges_show = 0
+    plotitem.patchedges_show = 0
+
+
+    #-----------------------------------------
     # Figure for velocities
     #-----------------------------------------
-    plotfigure = plotdata.new_plotfigure(name='Speeds', figno=1)
+    plotfigure = plotdata.new_plotfigure(name='Speeds', figno=2)
 
     # Set up for axes in this figure:
     plotaxes = plotfigure.new_plotaxes('speeds')
@@ -158,7 +217,7 @@ def setplot(plotdata):
     plotitem.plot_var = water_speed
     plotitem.pcolor_cmap = plt.get_cmap('PuBu')
     plotitem.pcolor_cmin = 0.0
-    plotitem.pcolor_cmax = 0.01
+    plotitem.pcolor_cmax = speed_limit
     plotitem.add_colorbar = True
     plotitem.amr_celledges_show = [0,0,0]
     plotitem.patchedges_show = 1
