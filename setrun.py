@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 """
 Module to set up run time parameters for Clawpack.
@@ -7,10 +8,6 @@ The values set in the function setrun are then written out to data files
 that will be read in by the Fortran code.
 
 """
-
-import os
-import numpy as np
-
 
 #------------------------------
 def setrun(claw_pkg='geoclaw'):
@@ -73,7 +70,7 @@ def setrun(claw_pkg='geoclaw'):
     clawdata.upper[1] = 21.0         # north latitude
 
 
-    # Number of grid cells: Coarsest grid
+    # Number of grid cells: Coarsest grid at 1/4 degree
     clawdata.num_cells[0] = 32
     clawdata.num_cells[1] = 14
 
@@ -132,7 +129,7 @@ def setrun(claw_pkg='geoclaw'):
         hours = 4
         output_per_hour = 2
         dt = 3600.0 / output_per_hour
-        clawdata.output_times = [0.0, 125.0, 250.0]
+        clawdata.output_times = [float(time) for time in xrange(0,250,25)]
         for n in xrange(1, hours * output_per_hour + 1):
             clawdata.output_times.append(clawdata.t0 + n * dt)
 
@@ -158,7 +155,7 @@ def setrun(claw_pkg='geoclaw'):
     # The current t, dt, and cfl will be printed every time step
     # at AMR levels <= verbosity.  Set verbosity = 0 for no printing.
     #   (E.g. verbosity == 2 means print only on levels 1 and 2.)
-    clawdata.verbosity = 1
+    clawdata.verbosity = 3
 
 
 
@@ -304,9 +301,9 @@ def setrun(claw_pkg='geoclaw'):
     amrdata.amr_levels_max = 3
 
     # List of refinement ratios at each level (length at least mxnest-1)
-    amrdata.refinement_ratios_x = [2,6]
-    amrdata.refinement_ratios_y = [2,6]
-    amrdata.refinement_ratios_t = [2,6]
+    amrdata.refinement_ratios_x = [4,2,2,6]
+    amrdata.refinement_ratios_y = [4,2,2,6]
+    amrdata.refinement_ratios_t = [4,2,2,6]
 
 
     # Specify type of each aux variable in amrdata.auxtype.
@@ -355,14 +352,36 @@ def setrun(claw_pkg='geoclaw'):
     rundata.regiondata.regions = []
     # to specify regions of refinement append lines of the form
     #  [minlevel,maxlevel,t1,t2,x1,x2,y1,y2]
-    # rundata.regiondata.regions.append([3, 3, 0., 10000., -85,-72,-38,-25])
+    # Region                Long (E)            Lat (N)
+    # Acapulco              -99º 52' 41.10"     16º 50' 18.19"
+    # Ixtapa-Zihuatanejo    -101º 33' 8.61"     17º 38' 15.15"
+    # Puerto Angel          -96º 29' 35.08"     15º 39' 53.28"
+
+    # Lázaro Cárdenas       -102º 9' 54.86"     17º 55' 30.66"
+    rundata.regiondata.regions.append([4, 5, 0.0, 1e10,
+                                        -102.2440361, -102.0918583,
+                                         17.89015556,  17.99216667])
 
     # ---------------
     # Gauges:
     # ---------------
     rundata.gaugedata.gauges = []
     # for gauges append lines of the form  [gaugeno, x, y, t1, t2]
-    rundata.gaugedata.gauges.append([1, -105, 14.0, 0., 1.e10])
+    # ID      Location Name       Lat               Long
+    # 1       Manzanillo, Col.    19º 3.4 N         104º 19.1 W
+    rundata.gaugedata.gauges.append([1, -104.3183333, 19.05666667, 0.0, 1.e10])
+    # 2       Ixtapa, Gro.        17º 40.1 N        101º 38.7 W
+    rundata.gaugedata.gauges.append([2, -101.645, 17.66833333, 0.0, 1.e10])
+    # 3       Zihuatanejo, Gro.   17º 38.2 N        101º 33.5 W
+    rundata.gaugedata.gauges.append([3, -101.5583333, 17.63666667, 0.0, 1.e10])
+    # 4       Acapulco, Gro.      16º 50.3 N        99º 54.2 W
+    rundata.gaugedata.gauges.append([4, -99.90333333, 16.83833333, 0.0, 1.e10])
+    # 5       Lázaro Cárdenas     17º 55' 26.59" N  102º 09' 48.36" W
+    rundata.gaugedata.gauges.append([5, -102.1634333, 17.92405278, 0.0, 1.e10])
+    # 6       Isla Socorro, Col.  18º 43.5 N        110º 57.0 W
+    rundata.gaugedata.gauges.append([6, -110.95, 18.725, 0.0, 1.e10])
+
+
     
 
     return rundata
@@ -418,16 +437,16 @@ def setgeo(rundata):
     # for moving topography, append lines of the form :   (<= 1 allowed for now!)
     #   [topotype, minlevel,maxlevel,fname] 
     # Vertical component considering homogeneous slip on the entire fault
-    dtopo_data.dtopofiles.append([1,3,3,'bathy/rot_gapThz.xyzt'])
+    # dtopo_data.dtopofiles.append([1,5,5,'bathy/rot_gapThz.xyzt'])
     # Magnitude (considering the 3 components) for homogeneous slip on the 
     # entire fault
-    # dtopo_data.dtopofiles.append([1,3,3,'bathy/rot_gapTh.xyzt'])
+    dtopo_data.dtopofiles.append([1,5,5,'bathy/rot_gapTh.xyzt'])
     # Magnitude (considering the 3 components) for stochastic slip on the entire
     # fault.
-    # dtopo_data.dtopofiles.append([1,3,3,'bathy/rot_gapvT.xyzt'])
+    # dtopo_data.dtopofiles.append([1,5,5,'bathy/rot_gapvT.xyzt'])
     # Vertical component considering stochastic slip on the entire fault (slide 
     # 4 in the pptx file I sent you in my previous e-mail)
-    # dtopo_data.dtopofiles.append([1,3,3,'bathy/rot_gapvTz.xyzt'])
+    # dtopo_data.dtopofiles.append([1,5,5,'bathy/rot_gapvTz.xyzt'])
 
 
     # == setqinit.data values ==
