@@ -81,6 +81,9 @@ def read_compsys_file(path, transform_coords):
 
     print "Done reading in data."
 
+    # Convert from centimeters to meters
+    z *= 0.01
+
     return num_cells, longlat_coords, z
 
 
@@ -130,7 +133,6 @@ def project_deformation(num_cells, longlat_coords, z, t_start=0.0, dt=5.0,
         # Project onto rotated grid
         Z_new[:,:,n] = interp.griddata(longlat_coords, z[:,n], (X_new, Y_new), 
                                                 method='linear', fill_value=0.0)
-        Z_new[:,:,n] *= 0.1
 
     return t, X_new, Y_new, Z_new
 
@@ -182,7 +184,7 @@ def write_deformation_to_file(t, X, Y, Z, output_file, topo_type=1):
         outfile.close()
 
 
-def plot_deformation_comparison(path, frames='all'):
+def plot_deformation_comparison(path, transform_coords, frames='all'):
     r"""Plot deformation comparisons between original COMPSYS file and rotated
 
     input
@@ -197,7 +199,7 @@ def plot_deformation_comparison(path, frames='all'):
     """
 
     # Read in data from original deformation file
-    num_cells, longlat_coords, z = read_compsys_file(path)
+    num_cells, longlat_coords, z = read_compsys_file(path, transform_coords)
 
     # Put data into correct shapes
     X = longlat_coords[0].reshape((num_cells[1], num_cells[0]))
@@ -208,25 +210,43 @@ def plot_deformation_comparison(path, frames='all'):
 
     # Transform to new arrays
     t, X_new, Y_new, Z_new =        \
-                        transform_deformation_file(num_cells, longlat_coords, z,
+                        project_deformation(num_cells, longlat_coords, z,
                                                     scaling=4.0)
+
+    # Find what colorbar limits would be best
+    colorbar_limits = [numpy.infty, -numpy.infty]
+    for frame in frames:
+        colorbar_limits[0] = min(colorbar_limits[0], numpy.min(Z[:,:,frame]))
+        colorbar_limits[0] = min(colorbar_limits[0], numpy.min(Z_new[:,:,frame]))
+        colorbar_limits[1] = max(colorbar_limits[1], numpy.max(Z[:,:,frame]))
+        colorbar_limits[1] = max(colorbar_limits[1], numpy.max(Z_new[:,:,frame]))
+
+    # Equalize limits?
+
 
     # Create frames list if not given or 'all' is used
     if frames is None or frames == 'all':
         frames = range(num_cells[2])
 
     # Plot original and transformed next to each other
-    fig = plt.figure()
+    fig, axes = plt.subplots(2, len(frames))
     fig.suptitle('Deformation for %s' % os.path.basename(path))
     for (n,frame) in enumerate(frames):
         # Plot original data in lat-long coordinates
-        axes = fig.add_subplot(len(frames), 2, 2 * n + 1)
-        axes.pcolor(X, Y, Z[:,:,frame])
-        axes.set_aspect('equal')
+        axes[0,n].pcolormesh(X, Y, Z[:,:,frame], vmin=colorbar_limits[0], 
+                                                      vmax=colorbar_limits[1])
+        axes[0,n].set_aspect('equal')
+        axes[0,n].set_title('Time t = %s seconds' % t[frame])
 
-        axes = fig.add_subplot(len(frames),2, 2 * n + 2)
-        axes.pcolor(X_new, Y_new, Z_new[:,:,frame])
-        axes.set_aspect('equal')
+        im = axes[1,n].pcolormesh(X_new, Y_new, Z_new[:,:,frame], 
+                                                   vmin=colorbar_limits[0], 
+                                                   vmax=colorbar_limits[1])
+        axes[1,n].set_aspect('equal')
+
+    # Add colorbar
+    colorbar = fig.colorbar(im, ax=list(axes.flatten()))
+    colorbar.set_label("Deformation (m)")
+    # colorbar.set_clim(colorbar_limits)
 
     return fig
 
@@ -245,7 +265,8 @@ if __name__ == "__main__":
     # Execute approrpiate command
     if command == 'plot':
         for deformation_file in file_list:
-            plot_deformation_comparison(deformation_file, frames=[0,25,49])
+            fig = plot_deformation_comparison(deformation_file, transform_coords, 
+                                          frames=[0,25,49])
         plt.show()
     elif command == 'transform':
         for deformation_file in file_list:
