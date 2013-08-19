@@ -84,7 +84,15 @@ def read_compsys_file(path, transform_coords):
     # Convert from centimeters to meters
     z *= 0.01
 
-    return num_cells, longlat_coords, z
+    # Add zero-deformation time
+    num_cells[2] += 1
+    x = numpy.concatenate((x[0:num_cells[0]*num_cells[1]],x))
+    y = numpy.concatenate((y[0:num_cells[0]*num_cells[1]],y))
+    z_new = numpy.zeros((num_cells[0] * num_cells[1], num_cells[2]))
+    z_new[:,1:] = z
+    del z
+
+    return num_cells, longlat_coords, z_new
 
 
 def project_deformation(num_cells, longlat_coords, z, t_start=0.0, dt=5.0, 
@@ -266,7 +274,7 @@ if __name__ == "__main__":
     if command == 'plot':
         for deformation_file in file_list:
             fig = plot_deformation_comparison(deformation_file, transform_coords, 
-                                          frames=[0,25,49])
+                                          frames=[1,25,49])
         plt.show()
     elif command == 'transform':
         for deformation_file in file_list:
