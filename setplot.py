@@ -164,7 +164,7 @@ def setplot(plotdata):
     #-----------------------------------------
     # Note that for the region names to come out correctly they either have 
     # to be in the html versions or latex versions as these are just titles
-    region_names = [r'L&agrave;zaro C&agrave;renas']
+    region_names = [r'Acapulco', r'L&agrave;zaro C&agrave;renas']
     for (n,region) in enumerate(regiondata.regions):
         plotfigure = plotdata.new_plotfigure(name='Surface Zoom of %s' % region_names[n])
 
@@ -276,7 +276,9 @@ def setplot(plotdata):
     plotitem = plotaxes.new_plotitem(plot_type='2d_pcolor')
     plotitem.plot_var = b
     plotitem.add_colorbar = True
-    plotitem.amr_celledges_show = [1,1,1,1,1,1,1]
+    plotitem.pcolor_cmin = -1000
+    plotitem.pcolor_cmax = 10
+    plotitem.amr_celledges_show = [0,0,0,0,0,0,0,0,0]
     plotitem.patchedges_show = 1
 
     #-----------------------------------------

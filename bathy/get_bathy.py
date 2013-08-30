@@ -52,6 +52,7 @@ if __name__ == "__main__":
         base_url = sys.argv[1]
 
     urls = [os.path.join(base_url, 'mexican_coast_pacific.tt3'),
+            os.path.join(base_url, 'srtm_17_09.tt3')
             os.path.join(base_url, 'gapTh.xyzt'),
             os.path.join(base_url, 'gapvT.xyzt'),
             os.path.join(base_url, 'gapThz.xyzt'),
