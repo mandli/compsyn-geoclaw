@@ -11,6 +11,8 @@ that will be read in by the Fortran code.
 
 import os
 
+import numpy
+
 #------------------------------
 def setrun(claw_pkg='geoclaw'):
 #------------------------------
@@ -132,6 +134,9 @@ def setrun(claw_pkg='geoclaw'):
         output_per_hour = 6
         dt = 3600.0 / output_per_hour
         clawdata.output_times = [float(time) for time in xrange(0,250,25)]
+        acapulco_time_zoom = numpy.linspace(0.07, 0.2, 10) * 3600.0
+        for new_time in acapulco_time_zoom:
+            clawdata.output_times.append(new_time)
         for n in xrange(1, hours * output_per_hour + 1):
             clawdata.output_times.append(clawdata.t0 + n * dt)
 
@@ -444,8 +449,8 @@ def setgeo(rundata):
     #    [topotype, minlevel, maxlevel, t1, t2, fname]
     topo_data.topofiles.append([3, 1, 10, 0., 1.e10, 
                           os.path.abspath('./bathy/mexican_coast_pacific.tt3')])
-    topo_data.topofiles.append([3, 1, 10, 0., 1.e10, 
-                          os.path.abspath('./bathy/srtm_17_09.tt3')])
+    # topo_data.topofiles.append([3, 1, 10, 0., 1.e10, 
+    #                       os.path.abspath('./bathy/srtm_17_09.tt3')])
 
     # == setdtopo.data values ==
     dtopo_data = rundata.dtopo_data

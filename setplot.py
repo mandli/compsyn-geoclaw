@@ -133,8 +133,9 @@ def setplot(plotdata):
     plotitem.pcolor_cmin = -surface_limit
     plotitem.pcolor_cmax = surface_limit
     plotitem.add_colorbar = True
-    plotitem.amr_celledges_show = [0,0,0]
-    plotitem.patchedges_show = 1
+    plotitem.colorbar_label = "Surface (m)"
+    plotitem.amr_celledges_show = [0,0,0,0,0,0,0]
+    plotitem.patchedges_show = 0
 
     # Land
     plotitem = plotaxes.new_plotitem(plot_type='2d_pcolor')
@@ -143,8 +144,8 @@ def setplot(plotdata):
     plotitem.pcolor_cmin = 0.0
     plotitem.pcolor_cmax = 100.0
     plotitem.add_colorbar = False
-    plotitem.amr_celledges_show = [1,0,0,0,0]
-    plotitem.patchedges_show = 1
+    plotitem.amr_celledges_show = [0,0,0,0,0,0,0]
+    plotitem.patchedges_show = 0
     plotaxes.xlimits = xlimits
     plotaxes.ylimits = ylimits
 
@@ -191,8 +192,9 @@ def setplot(plotdata):
         plotitem.pcolor_cmin = -surface_limit
         plotitem.pcolor_cmax = surface_limit
         plotitem.add_colorbar = True
-        plotitem.amr_celledges_show = [0,0,0]
-        plotitem.patchedges_show = 1
+        plotitem.colorbar_label = "Surface (m)"
+        plotitem.amr_celledges_show = [0,0,0,0,0,0,0]
+        plotitem.patchedges_show = 0
 
         # Land
         plotitem = plotaxes.new_plotitem(plot_type='2d_pcolor')
@@ -201,8 +203,8 @@ def setplot(plotdata):
         plotitem.pcolor_cmin = 0.0
         plotitem.pcolor_cmax = 100.0
         plotitem.add_colorbar = False
-        plotitem.amr_celledges_show = [1,0,0,0,0]
-        plotitem.patchedges_show = 1
+        plotitem.amr_celledges_show = [0,0,0,0,0,0,0]
+        plotitem.patchedges_show = 0
         plotaxes.xlimits = region[4:6]
         plotaxes.ylimits = region[6:9]
 
@@ -245,8 +247,8 @@ def setplot(plotdata):
     plotitem.pcolor_cmin = 0.0
     plotitem.pcolor_cmax = speed_limit
     plotitem.add_colorbar = True
-    plotitem.amr_celledges_show = [0,0,0]
-    plotitem.patchedges_show = 1
+    plotitem.amr_celledges_show = [0,0,0,0,0,0,0]
+    plotitem.patchedges_show = 0
 
     # Land
     plotitem = plotaxes.new_plotitem(plot_type='2d_pcolor')
@@ -255,8 +257,8 @@ def setplot(plotdata):
     plotitem.pcolor_cmin = 0.0
     plotitem.pcolor_cmax = 1000.0
     plotitem.add_colorbar = False
-    plotitem.amr_celledges_show = [1,0,0,0,0]
-    plotitem.patchedges_show = 1
+    plotitem.amr_celledges_show = [0,0,0,0,0,0,0]
+    plotitem.patchedges_show = 0
     plotaxes.xlimits = xlimits
     plotaxes.ylimits = ylimits
 
@@ -279,7 +281,7 @@ def setplot(plotdata):
     plotitem.pcolor_cmin = -1000
     plotitem.pcolor_cmax = 10
     plotitem.amr_celledges_show = [0,0,0,0,0,0,0,0,0]
-    plotitem.patchedges_show = 1
+    plotitem.patchedges_show = 0
 
     #-----------------------------------------
     # Figures for gauges
@@ -319,6 +321,8 @@ def setplot(plotdata):
         plot(t, 0*t, 'k')
         n = int(floor(t.max()/3600.) + 2)
         xticks([3600*i for i in range(n)])
+        plt.xlabel("t (s)")
+        plt.ylabel("Surface (m)")
 
     plotaxes.afteraxes = add_zeroline
 
