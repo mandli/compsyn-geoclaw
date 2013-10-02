@@ -56,7 +56,11 @@ if __name__ == "__main__":
             os.path.join(base_url, 'gapTh.xyzt'),
             os.path.join(base_url, 'gapvT.xyzt'),
             os.path.join(base_url, 'gapThz.xyzt'),
-            os.path.join(base_url, 'gapvTz.xyzt')]
+            os.path.join(base_url, 'gapvTz.xyzt'),
+            os.path.join(base_url, 'gapThr.xyzt'),
+            os.path.join(base_url, 'gapThzr.xyzt'),
+            os.path.join(base_url, 'gapvTr.xyzt'),
+            os.path.join(base_url, 'gapvTzr.xyzt')]
 
     for url in urls:
         get_bathy(url)
