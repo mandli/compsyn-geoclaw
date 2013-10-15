@@ -74,9 +74,10 @@ def setrun(claw_pkg='geoclaw'):
     clawdata.upper[1] = 21.0         # north latitude
 
 
-    # Number of grid cells: Coarsest grid at 1/4 degree
-    clawdata.num_cells[0] = 32
-    clawdata.num_cells[1] = 14
+    # Number of grid cells
+    res_factor = 1
+    clawdata.num_cells[0] = 32 * res_factor
+    clawdata.num_cells[1] = 14 * res_factor
 
     # ---------------
     # Size of system:
@@ -308,9 +309,9 @@ def setrun(claw_pkg='geoclaw'):
     amrdata.amr_levels_max = 6
 
     # List of refinement ratios at each level (length at least mxnest-1)
-    amrdata.refinement_ratios_x = [4,2,2,6,2]
-    amrdata.refinement_ratios_y = [4,2,2,6,2]
-    amrdata.refinement_ratios_t = [4,2,2,6,2]
+    amrdata.refinement_ratios_x = [4,2,2,6,8]
+    amrdata.refinement_ratios_y = [4,2,2,6,8]
+    amrdata.refinement_ratios_t = [4,2,2,6,8]
 
 
     # Specify type of each aux variable in amrdata.auxtype.
@@ -361,7 +362,7 @@ def setrun(claw_pkg='geoclaw'):
     #  [minlevel,maxlevel,t1,t2,x1,x2,y1,y2]
     # Region                Long (E)            Lat (N)
     # Acapulco              -99º 52' 41.10"     16º 50' 18.19"
-    rundata.regiondata.regions.append([6, 6, 0.0, 1e10,
+    rundata.regiondata.regions.append([1, 6, 0.0, 1e10,
                                         -100.1, -99.66666667,
                                          16.7, 16.96666667])
 
@@ -369,7 +370,7 @@ def setrun(claw_pkg='geoclaw'):
     # Puerto Angel          -96º 29' 35.08"     15º 39' 53.28"
 
     # Lázaro Cárdenas       -102º 9' 54.86"     17º 55' 30.66"
-    rundata.regiondata.regions.append([6, 6, 0.0, 1e10,
+    rundata.regiondata.regions.append([1, 6, 0.0, 1e10,
                                         -102.2440361, -102.0918583,
                                          17.89015556,  17.99216667])
 
@@ -439,9 +440,9 @@ def setgeo(rundata):
     # Refinement settings
     refinement_data = rundata.refinement_data
     refinement_data.variable_dt_refinement_ratios = True
-    refinement_data.wave_tolerance = 1.e-1
-    refinement_data.deep_depth = 1e2
-    refinement_data.max_level_deep = 3
+    refinement_data.wave_tolerance = 0.25
+    refinement_data.deep_depth = 200.0
+    refinement_data.max_level_deep = 5
 
     # == settopo.data values ==
     topo_data = rundata.topo_data
@@ -449,6 +450,8 @@ def setgeo(rundata):
     #    [topotype, minlevel, maxlevel, t1, t2, fname]
     topo_data.topofiles.append([3, 1, 10, 0., 1.e10, 
                           os.path.abspath('./bathy/mexican_coast_pacific.tt3')])
+    topo_data.topofiles.append([3, 1, 10, 0., 1.e10, 
+                          os.path.abspath('./bathy/acapulco_projected_30m.tt3')])
     # topo_data.topofiles.append([3, 1, 10, 0., 1.e10, 
     #                       os.path.abspath('./bathy/srtm_17_09.tt3')])
 
