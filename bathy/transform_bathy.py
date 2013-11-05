@@ -192,6 +192,55 @@ def write_deformation_to_file(t, X, Y, Z, output_file, topo_type=1):
         outfile.close()
 
 
+def read_dtopo_file(path, topo_type=1):
+    r""""""
+
+    if topo_type != 1:
+        raise ValueError("Topography type != 1 is not implemented.")
+
+    # Load raw data
+    data = numpy.loadtxt(path)
+
+    # Parse data
+    t = data[:,0]
+    x = data[:,1]
+    y = data[:,2]
+
+    # Initialize extents
+    t0 = t[0]
+    lower = [x[0], y[0]]
+    upper = [None, None]
+    num_cells = [0, 0]
+
+    # Count total x values
+    for row in xrange(1, data.shape[0]):
+        if x[row] == x[0]:
+            num_cells[0] = row
+            break
+
+    # Count total y values
+    for row in xrange(num_cells[0], data.shape[0]):
+        if t[row] != t0:
+            num_cells[1] = row / num_cells[0]
+            num_times = data.shape[0] / row
+            break
+
+    # Fill in rest of pertinent data
+    t = data[::num_cells[0] * num_cells[1], 0]
+    x = data[:num_cells[0], 1]
+    y = data[:num_cells[0] * num_cells[1]:num_cells[0], 2]
+    upper = [x[-1], y[-1]]
+    X, Y = numpy.meshgrid(x, y)
+    Z = numpy.empty( (num_times, num_cells[0], num_cells[1]) )
+
+    for (n,time) in enumerate(t):
+        Z[n,:,:] = data[num_cells[0] * num_cells[1] * n:
+                        num_cells[0] * num_cells[1] * (n+1), 3].reshape(
+                                (num_cells[0], num_cells[1]))
+
+    return t, x, y, Z
+
+
 def plot_deformation_comparison(path, transform_coords, frames='all'):
     r"""Plot deformation comparisons between original COMPSYS file and rotated
 
@@ -271,11 +320,31 @@ if __name__ == "__main__":
         file_list = glob.glob('./gap*.xyzt')
 
     # Execute approrpiate command
-    if command == 'plot':
+    if command == 'comparison':
         for deformation_file in file_list:
             fig = plot_deformation_comparison(deformation_file, transform_coords, 
                                           frames=[1,25,49])
+            fig.savefig('%s.png' % deformation_file)
         plt.show()
+    elif command == "plot":
+        # Use alread transformed files to plot
+        file_list = glob.glob("./rot_gap*.xyzt")
+        for deformation_file in file_list:
+            t, x, y, Z = read_dtopo_file(deformation_file)
+
+            for frame in [1, 25, 49]:
+                import matplotlib.pyplot as plt
+                fig = plt.figure()
+                axes = fig.add_subplot(111)
+                im = axes.pcolormesh(x,y,Z[frame,:,:])    
+                axes.set_aspect('equal')
+                axes.set_title('Time t = %s seconds' % t[frame])
+
+                colorbar = fig.colorbar(im, ax=list(axes.flatten()))
+                colorbar.set_label("Deformation (m)")
+
+                fig.savefig("%s_%s.png" % (deformation_file, str(frame).zfill(2)))
+
     elif command == 'transform':
         for deformation_file in file_list:
             # Read and transform deformation file
@@ -284,7 +353,7 @@ if __name__ == "__main__":
 
             # Project deformation into lat-long coordinates
             t, X, Y, Z = project_deformation(num_cells, longlat_coords, z,
-                                             scaling=4.0)
+                                             scaling=10.0)
             
             # Write out new grid
             prefix = 'rot'
