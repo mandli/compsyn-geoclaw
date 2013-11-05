@@ -4,7 +4,7 @@ import os
 import sys
 import glob
 
-import clawpack.clawutil.tests as clawtests
+import clawpack.tests as clawtests
 
 class FaultTest(clawtests.Test):
 
