@@ -165,7 +165,9 @@ def setplot(plotdata):
     #-----------------------------------------
     # Note that for the region names to come out correctly they either have 
     # to be in the html versions or latex versions as these are just titles
-    region_names = [r'Acapulco', r'L&agrave;zaro C&agrave;renas']
+    region_names = [r'Acapulco', r'L&agrave;zaro C&agrave;renas', r"Acapulco Zoom"]
+    #regiondata.regions.append([1,10,0.0,1e10,-99.9,-99.8516,16.7728,16.8589])
+    regiondata.regions.append([1,10,0.0,1e10,-99.935553872,-99.85133204,16.7724161258,16.85911507])
     for (n,region) in enumerate(regiondata.regions):
         plotfigure = plotdata.new_plotfigure(name='Surface Zoom of %s' % region_names[n])
 
