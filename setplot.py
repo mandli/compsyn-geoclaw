@@ -27,11 +27,18 @@ matplotlib.rcParams['ytick.labelsize'] = 12
 # DPI of output images
 matplotlib.rcParams['savefig.dpi'] = 100
 
+# Change backend
+# This does not work as pylab is imported before we are called
+# matplotlib.use('Agg') 
+
 import matplotlib.pyplot as plt
 
 from clawpack.visclaw import geoplot
 import clawpack.clawutil.data
 import clawpack.amrclaw.data
+
+plt.switch_backend('Agg')
+print matplotlib.get_backend()
 
 
 # try:
@@ -52,6 +59,7 @@ def setplot(plotdata):
     """ 
 
     plotdata.clearfigures()  # clear any old figures,axes,items data
+    plotdata.format = 'binary'
 
     data = clawpack.clawutil.data.ClawInputData(2)
     data.read('./claw.data')
