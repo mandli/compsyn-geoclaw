@@ -37,9 +37,7 @@ from clawpack.visclaw import geoplot
 import clawpack.clawutil.data
 import clawpack.amrclaw.data
 
-plt.switch_backend('Agg')
-print matplotlib.get_backend()
-
+print "Switching to", plt.switch_backend('Agg')
 
 # try:
 #     from setplotfg import setplotfg
