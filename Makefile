@@ -88,7 +88,7 @@ SOURCES = \
   $(GEOLIB)/ginit.f \
   $(GEOLIB)/getmaxspeed.f90 \
   $(GEOLIB)/advanc.f \
-  $(AMRLIB)/amr2.f90 \
+  $(GEOLIB)/amr2.f90 \
   $(AMRLIB)/quick_sort1.f \
   $(AMRLIB)/estdt.f \
   $(AMRLIB)/check4nans.f90 \
