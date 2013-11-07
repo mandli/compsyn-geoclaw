@@ -131,15 +131,15 @@ def setrun(claw_pkg='geoclaw'):
 
     elif clawdata.output_style == 2:
         # Specify a list of output times.
-        hours = 4
-        output_per_hour = 6
-        dt = 3600.0 / output_per_hour
         clawdata.output_times = [float(time) for time in xrange(0,250,25)]
         acapulco_time_zoom = numpy.linspace(0.07, 0.2, 10) * 3600.0
         for new_time in acapulco_time_zoom:
-            clawdata.output_times.append(new_time)
-        for n in xrange(1, hours * output_per_hour + 1):
-            clawdata.output_times.append(clawdata.t0 + n * dt)
+            clawdata.output_times.append(new_time) 
+        hours = 4
+        output_per_hour = 6
+        for time in numpy.linspace(0, hours * 3600, output_per_hour * hours + 1):
+            if time > clawdata.output_times[-1]:
+                clawdata.output_times.append(float(time))
 
     elif clawdata.output_style == 3:
         # Output every iout timesteps with a total of ntot time steps:
@@ -148,7 +148,7 @@ def setrun(claw_pkg='geoclaw'):
         clawdata.output_t0 = True
         
 
-    clawdata.output_format == 'ascii'      # 'ascii' or 'netcdf' 
+    clawdata.output_format = 'binary'      # 'ascii' or 'netcdf' 
 
     clawdata.output_q_components = 'all'   # need all
     clawdata.output_aux_components = 'none'  # eta=h+B is in q
@@ -306,7 +306,7 @@ def setrun(claw_pkg='geoclaw'):
     amrdata = rundata.amrdata
 
     # max number of refinement levels:
-    amrdata.amr_levels_max = 6
+    amrdata.amr_levels_max = 1
 
     # List of refinement ratios at each level (length at least mxnest-1)
     amrdata.refinement_ratios_x = [4,2,2,6,8]
