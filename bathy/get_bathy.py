@@ -24,6 +24,7 @@ def get_bathy(url, destination=os.getcwd(), force=False):
 
     tar = False
     gunzip = False
+    bzip = False
     split_file_name = file_name.split('.')
     if split_file_name[-1] == 'gz':
         gunzip = True
@@ -32,13 +33,21 @@ def get_bathy(url, destination=os.getcwd(), force=False):
     if split_file_name[-1] == 'tgz':
         gunzip = True
         tar = True
+    if split_file_name[-1] == 'bz2':
+        bzip = True
+        if split_file_name[-2] == 'tar':
+            tar = True
 
     if gunzip or tar:
         print "Extracting %s" % file_name
         if gunzip and tar:
             subprocess.Popen('tar xvzf %s' % output_path, shell=True)
+        elif bzip and tar:
+            subprocess.Popen('tar xvjf %s' % output_path, shel=True)
         elif gunzip:
             subprocess.Popen('gunzip %s' % output_path, shell=True)
+        elif bzip:
+            subprocess.Popen('bunzip2 %s' % output_path, shell=True)
         elif tar:
             subprocess.Popen('tar xvf %s' % output_path, shell=True)
 
@@ -52,7 +61,7 @@ if __name__ == "__main__":
         base_url = sys.argv[1]
 
     urls = [os.path.join(base_url, 'mexican_coast_pacific.tt3'),
-            os.path.join(base_url, 'srtm_17_09.tt3')
+            os.path.join(base_url, 'srtm_17_09.tt3'),
             os.path.join(base_url, 'gapTh.xyzt'),
             os.path.join(base_url, 'gapvT.xyzt'),
             os.path.join(base_url, 'gapThz.xyzt'),
