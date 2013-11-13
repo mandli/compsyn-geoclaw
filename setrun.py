@@ -306,12 +306,19 @@ def setrun(claw_pkg='geoclaw'):
     amrdata = rundata.amrdata
 
     # max number of refinement levels:
-    amrdata.amr_levels_max = 1
+    amrdata.amr_levels_max = 7
 
     # List of refinement ratios at each level (length at least mxnest-1)
-    amrdata.refinement_ratios_x = [4,2,2,6,8]
-    amrdata.refinement_ratios_y = [4,2,2,6,8]
-    amrdata.refinement_ratios_t = [4,2,2,6,8]
+    #  Level 1 - (1.0º,1.0º) - (100950.057205 m,110772.872596 m)
+    #  Level 2 - (0.25º,0.25º) - (25237.5143013 m,27693.2181489 m)
+    #  Level 3 - (0.125º,0.125º) - (12618.7571506 m,13846.6090744 m)
+    #  Level 4 - (0.0625º,0.0625º) - (6309.37857532 m,6923.30453722 m)
+    #  Level 5 - (0.0104166666667º,0.0104166666667º) - (1051.56309589 m,1153.88408954 m)
+    #  Level 6 - (0.00130208333333º,0.00130208333333º) - (131.445386986 m,144.235511192 m)
+    #  Level 7 - (8.13802083333e-05º,8.13802083333e-05º) - (8.21533668662 m,9.01471944951 m))
+    amrdata.refinement_ratios_x = [4,2,2,6,8,8]
+    amrdata.refinement_ratios_y = [4,2,2,6,8,8]
+    amrdata.refinement_ratios_t = [4,2,2,6,8,8]
 
 
     # Specify type of each aux variable in amrdata.auxtype.
@@ -362,17 +369,17 @@ def setrun(claw_pkg='geoclaw'):
     #  [minlevel,maxlevel,t1,t2,x1,x2,y1,y2]
     # Region                Long (E)            Lat (N)
     # Acapulco              -99º 52' 41.10"     16º 50' 18.19"
-    rundata.regiondata.regions.append([1, 6, 0.0, 1e10,
-                                        -100.1, -99.66666667,
-                                         16.7, 16.96666667])
+    #rundata.regiondata.regions.append([1, 6, 0.0, 1e10,
+    #                                    -100.1, -99.66666667,
+    #                                     16.7, 16.96666667])
 
     # Ixtapa-Zihuatanejo    -101º 33' 8.61"     17º 38' 15.15"
     # Puerto Angel          -96º 29' 35.08"     15º 39' 53.28"
 
     # Lázaro Cárdenas       -102º 9' 54.86"     17º 55' 30.66"
-    rundata.regiondata.regions.append([1, 6, 0.0, 1e10,
-                                        -102.2440361, -102.0918583,
-                                         17.89015556,  17.99216667])
+    #rundata.regiondata.regions.append([1, 6, 0.0, 1e10,
+    #                                    -102.2440361, -102.0918583,
+    #                                     17.89015556,  17.99216667])
 
     # ---------------
     # Gauges:
@@ -448,9 +455,9 @@ def setgeo(rundata):
     topo_data = rundata.topo_data
     # for topography, append lines of the form
     #    [topotype, minlevel, maxlevel, t1, t2, fname]
-    topo_data.topofiles.append([3, 1, 10, 0., 1.e10, 
+    topo_data.topofiles.append([3, 1, 5, 0., 1.e10, 
                           os.path.abspath('./bathy/mexican_coast_pacific.tt3')])
-    topo_data.topofiles.append([3, 1, 10, 0., 1.e10, 
+    topo_data.topofiles.append([3, 1, 7, 0., 1.e10, 
                           os.path.abspath('./bathy/acapulco_projected_30m.tt3')])
     # topo_data.topofiles.append([3, 1, 10, 0., 1.e10, 
     #                       os.path.abspath('./bathy/srtm_17_09.tt3')])
@@ -483,6 +490,11 @@ def setgeo(rundata):
     # for fixed grids append lines of the form
     # [t1,t2,noutput,x1,x2,y1,y2,xpoints,ypoints,\
     #  ioutarrivaltimes,ioutsurfacemax]
+
+    # fgmax data
+    #  Controls computation of maximum inundation height recording
+    fg_max_files = rundata.fgmax_data.fgmax_files
+    fgmax_files.append('fgmax_acapulco.txt')
 
     return rundata
     # end of function setgeo
