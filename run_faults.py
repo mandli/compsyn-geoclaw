@@ -39,7 +39,7 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         deformation_files = sys.argv[1:]
     else:
-        deformation_files = glob.glob('./bathy/rot_gap*.xyzt')
+        deformation_files = glob.glob('./bathy/rot_gap*z*.xyzt')
 
     tests = []
     for deformation_file in deformation_files:
