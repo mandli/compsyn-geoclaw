@@ -1,13 +1,54 @@
+#!/usr/bin/env python
 """
 Plot fgmax output from GeoClaw runs, assuming points are on a rectangular
 grid.
 
 """
 
-
-from pylab import *
-from numpy import ma
 import os
+
+import numpy
+
+import matplotlib.pyplot as plt
+
+import clawpack.clawutil.data as clawdata
+import clawpack.geoclaw.data as geodata
+
+def make_fgmax_plots(output_path="_output", data_path="_output", 
+                     plot_path="_plots", plot_zeta=True, plot_zeta_times=True, 
+                     plot_arrival_times=True):
+    r""""""
+
+    # Load appropriate data files
+    claw_data = clawdata.ClawpackInputData()
+    claw_data.read(os.path.join(data_path, 'claw.data'))
+    geo_data = geodata.GeoclawInputData()
+    geo_data.read(os.path.join(data_path, 'geo.data'))
+
+    # Parse fgmax input data file
+    fgmax_input = open(os.path.join(data_path, 'fgmax_data.txt'), 'r')
+    num_cells = [int(value) for value in fgmax_input.readline().split()]
+    min_level = 2
+
+    # Parameters
+    zeta_contours = []
+    t_contours = []
+    topo_contours = []
+
+    # Load fgmax output data
+    fg_data = numpy.loadtxt(os.path.join(output_path, 'fort.FG1.valuemax'))
+    
+    x = numpy.reshape(fg_data[:,0], (mx,my), order='F')
+    y = numpy.reshape(fg_data[:,1], (mx,my), order='F')
+    y0 = 0.5 * (y.min() + y.max())   # mid-latitude for scaling plots
+    eta_tilde = numpy.reshape(fg_data[:,3], (mx,my), order='F')
+    level = numpy.reshape(fg_data[:,2].astype('int'), (mx,my), order='F')
+
+    # Load fgmax bathymetry data
+    fg_aux_data = numpy.loadtxt(os.path.join(output_path, 'fort.FG1.aux1'))
+    for n in xrange(min_level)
+
+
 
 def make_plots(outdir='_output', plotdir='_plots'):
 

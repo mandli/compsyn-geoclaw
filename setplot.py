@@ -7,6 +7,8 @@ function setplot is called to set the plot parameters.
     
 """ 
 
+import sys
+
 import numpy as np
 
 # Plot customization
@@ -37,13 +39,14 @@ from clawpack.visclaw import geoplot
 import clawpack.clawutil.data
 import clawpack.amrclaw.data
 
-print "Switching to", plt.switch_backend('Agg')
+if not (sys.platform == 'darwin'):
+    print "Switching to", plt.switch_backend('Agg')
 
-# try:
-#     from setplotfg import setplotfg
-# except:
-#     print "Did not find setplotfg.py"
-#     setplotfg = None
+try:
+    from setplotfg import setplotfg
+except:
+    print "Did not find setplotfg.py"
+    setplotfg = None
 
 #--------------------------
 def setplot(plotdata):
@@ -174,6 +177,7 @@ def setplot(plotdata):
     region_names = [r'Acapulco', r'L&agrave;zaro C&agrave;renas', r"Acapulco Zoom"]
     #regiondata.regions.append([1,10,0.0,1e10,-99.9,-99.8516,16.7728,16.8589])
     regiondata.regions.append([1,10,0.0,1e10,-99.935553872,-99.85133204,16.7724161258,16.85911507])
+    regiondata.regions.append([None, None, None, None,])
     for (n,region) in enumerate(regiondata.regions):
         plotfigure = plotdata.new_plotfigure(name='Surface Zoom of %s' % region_names[n])
 
@@ -286,7 +290,7 @@ def setplot(plotdata):
     plotitem = plotaxes.new_plotitem(plot_type='2d_pcolor')
     plotitem.plot_var = b
     plotitem.add_colorbar = True
-    plotitem.pcolor_cmin = -1000
+    plotitem.pcolor_cmin = -10
     plotitem.pcolor_cmax = 10
     plotitem.amr_celledges_show = [0,0,0,0,0,0,0,0,0]
     plotitem.patchedges_show = 0
@@ -319,8 +323,8 @@ def setplot(plotdata):
         topo = eta - h
         return topo
         
-    # plotitem.plot_var = gaugetopo
-    # plotitem.plotstyle = 'g-'
+    plotitem.plot_var = gaugetopo
+    plotitem.plotstyle = 'g-'
 
     def add_zeroline(current_data):
         from pylab import plot, legend, xticks, floor

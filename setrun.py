@@ -273,33 +273,6 @@ def setrun(claw_pkg='geoclaw'):
         clawdata.checkpt_interval = 5
 
 
-    # --------------
-    # Checkpointing:
-    # --------------
-
-    # Specify when checkpoint files should be created that can be
-    # used to restart a computation.
-
-    clawdata.checkpt_style = 0
-
-    if clawdata.checkpt_style == 0:
-        # Do not checkpoint at all
-        pass
-
-    elif clawdata.checkpt_style == 1:
-        # Checkpoint only at tfinal.
-        pass
-
-    elif clawdata.checkpt_style == 2:
-        # Specify a list of checkpoint times.  
-        clawdata.checkpt_times = [0.1,0.15]
-
-    elif clawdata.checkpt_style == 3:
-        # Checkpoint every checkpt_interval timesteps (on Level 1)
-        # and at the final time.
-        clawdata.checkpt_interval = 5
-
-
     # ---------------
     # AMR parameters:
     # ---------------
@@ -389,26 +362,37 @@ def setrun(claw_pkg='geoclaw'):
     # for gauges append lines of the form  [gaugeno, x, y, t1, t2]
     # ID      Location Name             Lat               Long
     # 1       Manzanillo, Col.          19º 3.4 N         104º 19.1 W
-    rundata.gaugedata.gauges.append([1, -104.3183333, 19.05666667, 0.0, 1.e10])
+    # rundata.gaugedata.gauges.append([1, -104.3183333, 19.05666667, 0.0, 1.e10])
     # 2       Ixtapa, Gro.              17º 40.1 N        101º 38.7 W
-    rundata.gaugedata.gauges.append([2, -101.645, 17.66833333, 0.0, 1.e10])
+    # rundata.gaugedata.gauges.append([2, -101.645, 17.66833333, 0.0, 1.e10])
     # 3       Zihuatanejo, Gro.         17º 38.2 N        101º 33.5 W
-    rundata.gaugedata.gauges.append([3, -101.5583333, 17.63666667, 0.0, 1.e10])
+    # rundata.gaugedata.gauges.append([3, -101.5583333, 17.63666667, 0.0, 1.e10])
     # 4       Acapulco, Gro.            16º 50.3 N        99º 54.2 W
     rundata.gaugedata.gauges.append([4, -99.90333333, 16.83833333, 0.0, 1.e10])
     # 5       Isla Socorro, Col.        18º 43.5 N        110º 57.0 W
-    rundata.gaugedata.gauges.append([5, -110.95, 18.725, 0.0, 1.e10])
+    # rundata.gaugedata.gauges.append([5, -110.95, 18.725, 0.0, 1.e10])
     # 6       Puerto Angel, Oax         15º 40 N          96º 29.5 W
-    rundata.gaugedata.gauges.append([6, -degminsec2dec(96,29.5,0), degminsec2dec(15,40,0), 0.0, 1.e10])
+    # rundata.gaugedata.gauges.append([6, -degminsec2dec(96,29.5,0), degminsec2dec(15,40,0), 0.0, 1.e10])
     # 7       Salina Cruz, Oax.         16º 19.1 N        95º 11.8 W
-    rundata.gaugedata.gauges.append([7, -degminsec2dec(95,11.8,0), degminsec2dec(16,19.1,0.0), 0.0, 1.e10])
+    # rundata.gaugedata.gauges.append([7, -degminsec2dec(95,11.8,0), degminsec2dec(16,19.1,0.0), 0.0, 1.e10])
     # 8       Puerto Madero, Chis       14º 42.7 N        92º 24.1 W
-    rundata.gaugedata.gauges.append([8, -degminsec2dec(92,24.1,0), degminsec2dec(14,42.7,0), 0.0, 1.e10])
+    # rundata.gaugedata.gauges.append([8, -degminsec2dec(92,24.1,0), degminsec2dec(14,42.7,0), 0.0, 1.e10])
     # 9       Lazaro Cardenas, Mich     17º 56.4 N        102º 10.7 W
-    rundata.gaugedata.gauges.append([9, -degminsec2dec(102,10.7,0.0), degminsec2dec(17,56.4,0.0), 0.0, 1.e10])
+    # rundata.gaugedata.gauges.append([9, -degminsec2dec(102,10.7,0.0), degminsec2dec(17,56.4,0.0), 0.0, 1.e10])
     # 10      Huatulco                  15° 45'.2 N       96° 07'.8 W     
-    rundata.gaugedata.gauges.append([10, -degminsec2dec(96,7.8,0.0), degminsec2dec(15,45.2,0.0), 0.0, 1.e10])
-
+    # rundata.gaugedata.gauges.append([10, -degminsec2dec(96,7.8,0.0), degminsec2dec(15,45.2,0.0), 0.0, 1.e10])
+    # 11      Acapulco                  16°51'9.00"N      99°52'50"W 
+    rundata.gaugedata.gauges.append([11, -degminsec2dec(99,52,50), degminsec2dec(16,51,9), 0.0, 1.e10])
+    # 12      Acapulco additional gauges
+    rundata.gaugedata.gauges.append([12, -99.904294, 16.839721, 0.0, 1.e10])
+    rundata.gaugedata.gauges.append([13, -99.905197, 16.840743, 0.0, 1.e10])
+    rundata.gaugedata.gauges.append([14, -99.903940, 16.842113, 0.0, 1.e10])
+    rundata.gaugedata.gauges.append([15, -99.902489, 16.843462, 0.0, 1.e10])
+    rundata.gaugedata.gauges.append([16, -99.898397, 16.845365, 0.0, 1.e10])
+    rundata.gaugedata.gauges.append([17, -99.891848, 16.851036, 0.0, 1.e10])
+    rundata.gaugedata.gauges.append([18, -99.860943, 16.848830, 0.0, 1.e10])
+    rundata.gaugedata.gauges.append([19, -99.856680, 16.839136, 0.0, 1.e10])
+    rundata.gaugedata.gauges.append([20, -99.888627, 16.816910, 0.0, 1.e10])
 
     return rundata
     # end of function setrun
@@ -465,18 +449,10 @@ def setgeo(rundata):
     # == setdtopo.data values ==
     dtopo_data = rundata.dtopo_data
     # for moving topography, append lines of the form :   (<= 1 allowed for now!)
-    #   [topotype, minlevel,maxlevel,fname] 
-    # Vertical component considering homogeneous slip on the entire fault
-    # dtopo_data.dtopofiles.append([1,5,5,'bathy/rot_gapThz.xyzt'])
-    # Magnitude (considering the 3 components) for homogeneous slip on the 
-    # entire fault
-    # dtopo_data.dtopofiles.append([1,5,5,'bathy/rot_gapTh.xyzt'])
-    # Magnitude (considering the 3 components) for stochastic slip on the entire
-    # fault.
-    dtopo_data.dtopofiles.append([1,5,5,'bathy/rot_gapvT.xyzt'])
-    # Vertical component considering stochastic slip on the entire fault (slide 
-    # 4 in the pptx file I sent you in my previous e-mail)
-    # dtopo_data.dtopofiles.append([1,5,5,'bathy/rot_gapvTz.xyzt'])
+    #   [topotype, minlevel,maxlevel,fname]
+    dtopo_data.dtopofiles.append([1,3,5,'bathy/rot_gapSvr1zvT.xyzt'])
+    # Note that if the run_faults.py script is used this is overriden there
+
 
 
     # == setqinit.data values ==
@@ -491,10 +467,10 @@ def setgeo(rundata):
     # [t1,t2,noutput,x1,x2,y1,y2,xpoints,ypoints,\
     #  ioutarrivaltimes,ioutsurfacemax]
 
-    # fgmax data
-    #  Controls computation of maximum inundation height recording
-    fg_max_files = rundata.fgmax_data.fgmax_files
-    fgmax_files.append('fgmax_acapulco.txt')
+    # == fgmax.data values ==
+    fgmax_files = rundata.fgmax_data.fgmax_files
+    # for fixed grids append to this list names of any fgmax input files
+    fgmax_files.append(os.path.abspath(os.path.join(os.getcwd(),'fgmax_grid.txt')))
 
     return rundata
     # end of function setgeo

@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
-import numpy
+import sys
 
+import numpy
 import matplotlib.pyplot as plt
 import mpl_toolkits.basemap.pyproj as pyproj
 
@@ -35,22 +36,33 @@ if __name__ == "__main__":
     conv_region_bathy = "acapulco_converted_30m.xyz"
     new_bathy = "acapulco_projected_30m.tt3"
 
-    # Convert and write out UTM data
-    acapulco = convert_UTM2longlat(region_bathy, out_path=conv_region_bathy)
+    tasks = ["extract","plot"]
+    if len(sys.argv) > 1:
+        tasks = sys.argv[1:]
 
-    # Find extent of acapulco data
-    rect = [numpy.min(acapulco[0]), numpy.max(acapulco[0]), 
-            numpy.min(acapulco[1]), numpy.max(acapulco[1])]
+    for task in tasks:
+        if task == "extract":
+            # Convert and write out UTM data
+            acapulco = convert_UTM2longlat(region_bathy, out_path=conv_region_bathy)
 
-    # Extract and project data
-    Z, delta = extract_bathy.extract(conv_region_bathy, base_bathy_file, 
-                                        extent=rect, no_data_value=-9999)
-    extract_bathy.write_bathy(new_bathy, Z, (rect[0], rect[2]), delta, 
-                                            no_data_value=-9999)
-    # write_bathy(new_bathy, )
-    # Z, delta = extract_bathy.extract(new_bathy, "mexican_coast_pacific.tt3",
-                                        # extent=rect)
+            # Find extent of acapulco data
+            rect = [numpy.min(acapulco[0]), numpy.max(acapulco[0]), 
+                    numpy.min(acapulco[1]), numpy.max(acapulco[1])]
 
-    # Plot new data
-    bathy.plot(new_bathy, coastlines=True)
-    plt.show()
+            # Extract and project data
+            Z, delta = extract_bathy.extract(conv_region_bathy, base_bathy_file, 
+                                            extent=rect, no_data_value=-9999)
+            extract_bathy.write_bathy(new_bathy, Z, (rect[0], rect[2]), delta, 
+                                                no_data_value=-9999)
+        elif task == "plot":
+            # Plot new data
+            axes = [None, None, None]
+            axes[0] = bathy.plot(new_bathy, contours=[0.0,1.0,2.0,3.0,4.0,5.0], coastlines=False)
+            axes[1] = bathy.plot(base_bathy_file, contours=numpy.linspace(-10,5,16), coastlines=False)
+            axes[2] = bathy.plot('./mexican_coast_pacific.tt3', contours=[0.0,1.0,2.0,3.0,4.0,5.0], coastlines=False)
+
+            # Plot acapulco gauge location
+            for axis in axes:
+                axis.plot([-99.90333333], [16.83833333], 'ro')
+
+            plt.show()
