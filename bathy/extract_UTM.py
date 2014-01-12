@@ -1,12 +1,9 @@
 #!/usr/bin/env python
 
-import sys
-
 import numpy
 import matplotlib.pyplot as plt
 import mpl_toolkits.basemap.pyproj as pyproj
 
-import extract_bathy
 import bathy
 
 def convert_UTM2longlat(file_path, zone=14, out_path=None):
@@ -16,17 +13,10 @@ def convert_UTM2longlat(file_path, zone=14, out_path=None):
     z = -data[:,2]
 
     if isinstance(out_path, basestring):
-        write_bathy(out_path, longitude, latitude, z)
+        bathy.write_unstructured(out_path, longitude, latitude, z)
 
     return longitude, latitude, z
 
-
-def write_bathy(file_path, longitude, latitude, z, topotype=1):
-    bathy_file = open(file_path, 'w')
-    for (i, depth) in enumerate(z):
-        bathy_file.write("%s %s %s\n" % (longitude[i], latitude[i], depth))
-
-    bathy_file.close()
 
 if __name__ == "__main__":
 
@@ -36,33 +26,51 @@ if __name__ == "__main__":
     conv_region_bathy = "acapulco_converted_30m.xyz"
     new_bathy = "acapulco_projected_30m.tt3"
 
-    tasks = ["extract","plot"]
-    if len(sys.argv) > 1:
-        tasks = sys.argv[1:]
+    # Convert from UTM and write out original data for use later in extraction
+    print "Converting UTM to long-lat..."
+    longitude, latitude, z = convert_UTM2longlat(region_bathy, 
+                                                     out_path=conv_region_bathy)
+    print "  ...done."
 
-    for task in tasks:
-        if task == "extract":
-            # Convert and write out UTM data
-            acapulco = convert_UTM2longlat(region_bathy, out_path=conv_region_bathy)
+    # Smooth out region near shore
+    # Use previous axes with data to show where smoothing will be
+    print "Running filter..."
+    center = (-99.9029,16.840)
+    radius = bathy.meters2deg(200.0, center[1])
+    filter_radius = bathy.meters2deg(30.0, center[1])
+    for i in xrange(z.shape[0]):
+        if radius >= numpy.sqrt((longitude[i] - center[0])**2 + (latitude[i] - center[1])**2):
+            running_ave_depth = z[i]
+            num_points_found = 1
+            for j in xrange(z.shape[0]):
+                if filter_radius >= numpy.sqrt((longitude[j] - longitude[i])**2 + (latitude[j] - latitude[i])**2):
+                    running_ave_depth += z[j]
+                    num_points_found += 1
+            z[i] = running_ave_depth / num_points_found
+    print "  ...done."
 
-            # Find extent of acapulco data
-            rect = [numpy.min(acapulco[0]), numpy.max(acapulco[0]), 
-                    numpy.min(acapulco[1]), numpy.max(acapulco[1])]
+    # Find extent of acapulco data, buffered a bit
+    dx = bathy.meters2deg(250.0, 0.5 * (latitude[-1] + latitude[0]))
+    rect = [numpy.min(longitude) - dx, numpy.max(longitude) + dx, 
+            numpy.min(latitude) - dx, numpy.max(latitude) + dx]
 
-            # Extract and project data
-            Z, delta = extract_bathy.extract(conv_region_bathy, base_bathy_file, 
-                                            extent=rect, no_data_value=-9999)
-            extract_bathy.write_bathy(new_bathy, Z, (rect[0], rect[2]), delta, 
-                                                no_data_value=-9999)
-        elif task == "plot":
-            # Plot new data
-            axes = [None, None, None]
-            axes[0] = bathy.plot(new_bathy, contours=[0.0,1.0,2.0,3.0,4.0,5.0], coastlines=False)
-            axes[1] = bathy.plot(base_bathy_file, contours=numpy.linspace(-10,5,16), coastlines=False)
-            axes[2] = bathy.plot('./mexican_coast_pacific.tt3', contours=[0.0,1.0,2.0,3.0,4.0,5.0], coastlines=False)
+    # Extract and project original data
+    Z, delta = bathy.extract(conv_region_bathy, base_bathy_file, 
+                                    extent=rect, no_data_value=-9999)
 
-            # Plot acapulco gauge location
-            for axis in axes:
-                axis.plot([-99.90333333], [16.83833333], 'ro')
 
-            plt.show()
+    
+
+
+    # Write out data
+    bathy.write(new_bathy, Z, (rect[0], rect[2]), delta, 
+                                        no_data_value=-9999)
+
+    # Plot overlay of old bathymetry extent and SRTM data for new bathy
+    axes = bathy.plot(new_bathy, region_extent=rect, limits=[-20,20])
+    # axes.scatter(longitude, latitude, c=z, cmap=plt.get_cmap('terrain'), alpha=1.0)
+    theta = numpy.linspace(0,2 * numpy.pi,360)
+    axes.plot(radius * numpy.cos(theta) + center[0], 
+              radius * numpy.sin(theta) + center[1],'y-',linewidth=10)
+
+    plt.show()

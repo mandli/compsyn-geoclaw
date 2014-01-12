@@ -137,10 +137,11 @@ class Topography(object):
             else:
                 # All other topography types should have equally spaced grid
                 # points in each direction
-                self._delta = [self.x[1] - self.[0], self.y[1] - self.y[0]]
-                assert self._delta[0] == self.x[-2] - self.x[-1] and   \
-                       self._delta[1] == self.y[-2] - self.y[-1]       \
-                       "Grid spacing delta not constant, %s" % self._delta
+                self._delta = [self.x[1] - self.x[0], self.y[1] - self.y[0]]
+                check_delta = [self.x[-2] - self.x[-1], self.y[-2] - self.y[-1]]
+                assert self._delta[0] == check_delta,                  \
+                       "Grid spacing delta not constant, %s != %s." %  \
+                       (self._delta, check_delta)
         return self._delta
 
 
@@ -625,13 +626,11 @@ def plot(path, region_extent=None, contours=None, coastlines=True,
     else:
         depth_extent = limits
 
-    import pdb; pdb.set_trace()
-
     # Create color map
-    cmap = colormaps.make_colormap({-1:[0.3,0.2,0.1],
-                                       -0.00001:[0.95,0.9,0.7],
-                                       0.00001:[.5,.7,0],
-                                       1:[.2,.5,.2]})
+    # cmap = colormaps.make_colormap({-1:[0.3,0.2,0.1],
+    #                                    -0.00001:[0.95,0.9,0.7],
+    #                                    0.00001:[.5,.7,0],
+    #                                    1:[.2,.5,.2]})
     color_norm = colors.Normalize(depth_extent[0],depth_extent[1],clip=True)
 
     # Plot data
