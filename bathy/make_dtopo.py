@@ -363,8 +363,8 @@ if __name__ == "__main__":
                                                          transform_coords)
 
         # TEMPORARY:  Remove last 2 invalid time points
-        z = z[:,:-1]
-        num_cells[2] -= 1
+        z = z[:,:-2]
+        num_cells[2] -= 2
 
         # Put data into correct shapes for later
         X_orig = longlat_coords[0].reshape((num_cells[1], num_cells[0]))
@@ -401,8 +401,8 @@ if __name__ == "__main__":
                     scaling=scaling)
 
             # TEMPORARY:  Remove last 2 invalid time points
-            z = z[:,:-1]
-            num_cells[2] -= 1
+            z = z[:,:-2]
+            num_cells[2] -= 2
 
             prefix = 'rot_west'
             out_path = os.getcwd()
