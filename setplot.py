@@ -68,8 +68,6 @@ def setplot(plotdata):
     regiondata.read('./regions.data')
     xlimits = (data.lower[0], data.upper[0])
     ylimits = (data.lower[1], data.upper[1])
-    xlimits_zoom = (-105.0, -98.0)
-    ylimits_zoom = (15.0, 18.0)
     surface_limit = 1.0
     speed_limit = 1.0
 
@@ -174,12 +172,16 @@ def setplot(plotdata):
     #-----------------------------------------
     # Note that for the region names to come out correctly they either have 
     # to be in the html versions or latex versions as these are just titles
-    region_names = [r'Acapulco', r'L&agrave;zaro C&agrave;renas', r"Acapulco Zoom"]
+    # region_names = [r'Acapulco', r"Acapulco Zoom"]
     #regiondata.regions.append([1,10,0.0,1e10,-99.9,-99.8516,16.7728,16.8589])
-    regiondata.regions.append([1,10,0.0,1e10,-99.935553872,-99.85133204,16.7724161258,16.85911507])
-    regiondata.regions.append([None, None, None, None,])
+    regiondata.regions.append([1, 10, 0.0, 1e10, 
+                      -99.9364923773, -99.80, 16.7714776209, 16.86007248])
+    regiondata.regions.append([1, 10, 0.0, 1e10, 
+                      -99.9797, -99.8335, 16.72, 16.876])
+    regiondata.regions.append([1, 10, 0.0, 1e10, 
+                      -99.9119, -99.8961, 16.8366, 16.8511])
     for (n,region) in enumerate(regiondata.regions):
-        plotfigure = plotdata.new_plotfigure(name='Surface Zoom of %s' % region_names[n])
+        plotfigure = plotdata.new_plotfigure()#name='Surface Zoom of %s' % region_names[n])
 
         # Set up for axes in this figure:
         plotaxes = plotfigure.new_plotaxes('pcolor')
@@ -304,7 +306,7 @@ def setplot(plotdata):
     # Set up for axes in this figure:
     plotaxes = plotfigure.new_plotaxes()
     plotaxes.xlimits = 'auto'
-    plotaxes.ylimits = 'auto'
+    plotaxes.ylimits = [-5,5]
     plotaxes.title = 'Surface'
 
     # Plot surface as blue curve:

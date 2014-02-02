@@ -374,7 +374,7 @@ def setrun(claw_pkg='geoclaw'):
     # 6       Puerto Angel, Oax         15º 40 N          96º 29.5 W
     # rundata.gaugedata.gauges.append([6, -degminsec2dec(96,29.5,0), degminsec2dec(15,40,0), 0.0, 1.e10])
     # 7       Salina Cruz, Oax.         16º 19.1 N        95º 11.8 W
-    # rundata.gaugedata.gauges.append([7, -degminsec2dec(95,11.8,0), degminsec2dec(16,19.1,0.0), 0.0, 1.e10])
+    rundata.gaugedata.gauges.append([7, -degminsec2dec(95,11.8,0), degminsec2dec(16,19.1,0.0), 0.0, 1.e10])
     # 8       Puerto Madero, Chis       14º 42.7 N        92º 24.1 W
     # rundata.gaugedata.gauges.append([8, -degminsec2dec(92,24.1,0), degminsec2dec(14,42.7,0), 0.0, 1.e10])
     # 9       Lazaro Cardenas, Mich     17º 56.4 N        102º 10.7 W
@@ -443,8 +443,8 @@ def setgeo(rundata):
                           os.path.abspath('./bathy/mexican_coast_pacific.tt3')])
     topo_data.topofiles.append([3, 1, 7, 0., 1.e10, 
                           os.path.abspath('./bathy/acapulco_projected_30m.tt3')])
-    # topo_data.topofiles.append([3, 1, 10, 0., 1.e10, 
-    #                       os.path.abspath('./bathy/srtm_17_09.tt3')])
+    topo_data.topofiles.append([3, 1, 10, 0., 1.e10, 
+                          os.path.abspath('./bathy/srtm_subsection.tt3')])
 
     # == setdtopo.data values ==
     dtopo_data = rundata.dtopo_data
