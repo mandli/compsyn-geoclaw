@@ -71,7 +71,6 @@ SOURCES = \
   $(GEOLIB)/bc2amr.f \
   $(GEOLIB)/update.f \
   $(GEOLIB)/setaux.f90 \
-  $(GEOLIB)/setauxCopy.f90 \
   $(GEOLIB)/flag2refine2.f90  \
   $(AMRLIB)/flagregions2.f90  \
   $(GEOLIB)/allowflag.f90  \
@@ -161,7 +160,6 @@ SOURCES = \
   $(AMRLIB)/intcopy.f \
   $(AMRLIB)/preintcopy.f \
   $(AMRLIB)/icall.f \
-  $(AMRLIB)/icallCopy.f \
   $(AMRLIB)/preicall.f \
   $(AMRLIB)/inlinelimiter.f \
   $(AMRLIB)/cstore.f \
