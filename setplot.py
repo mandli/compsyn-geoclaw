@@ -38,6 +38,7 @@ import matplotlib.pyplot as plt
 from clawpack.visclaw import geoplot
 import clawpack.clawutil.data
 import clawpack.amrclaw.data
+import clawpack.geoclaw.topo as topo
 
 if not (sys.platform == 'darwin'):
     print "Switching to", plt.switch_backend('Agg')
@@ -47,6 +48,28 @@ try:
 except:
     print "Did not find setplotfg.py"
     setplotfg = None
+
+# Try and load Acapulco gauge data for 1957 quake
+try:
+    gauge_path = "./gauge_obs/fig2.txt"
+    gauge_data = np.loadtxt(gauge_path, skiprows=1, delimiter=',')
+except IOError:
+    pass
+
+# Create subfault for plotting
+try:    
+    subfault = topo.SubFault(units={"slip":"cm", "dimensions":"km", "depth":"km"})
+    subfault.coordinates = [-99.25, 16.6]
+    subfault.coordinate_specification = "top center"
+    subfault.slip = 200
+    subfault.rake = 90.0
+    subfault.strike = 296
+    subfault.dip = 25.0
+    subfault.depth = 12.0
+    subfault.dimensions = (90.0, 70.0)
+except:
+    subfault = None
+
 
 #--------------------------
 def setplot(plotdata):
@@ -130,6 +153,11 @@ def setplot(plotdata):
         pylab.title('Surface at %4.2f hours' % t, fontsize=20)
         pylab.xticks(fontsize=15)
         pylab.yticks(fontsize=15)
+
+        # Plot fault plane
+        subfault.plot_fault_rect(pylab.gca())
+        subfault.plot_rake(pylab.gca())
+
     plotaxes.afteraxes = fixup
 
     # Water
@@ -276,12 +304,43 @@ def setplot(plotdata):
     plotaxes.xlimits = xlimits
     plotaxes.ylimits = ylimits
 
+    # =================================
+    #  Plot Deformation with Coastline
+    # =================================
+    plotfigure = plotdata.new_plotfigure(name="Deformation")
+    plotfigure.show = (subfault is not None)
+
+    def add_deformation_plots(cd):
+        axes = plt.gca()
+        subfault.plot(axes, contours=[0.02, 0.15, 0.50])
+        subfault.plot_fault_rect(axes)
+        subfault.plot_rake(axes)
+
+    if subfault is not None:
+        plotaxes = plotfigure.new_plotaxes()
+        plotaxes.xlimits = [subfault.x[0], subfault.x[-1]]
+        plotaxes.ylimits = [subfault.y[0], subfault.y[-1]]
+        plotaxes.title = "Subfault Deformation"
+        plotaxes.scaled = True
+    
+        plotitem = plotaxes.new_plotitem(plot_type='2d_contour')
+        plotitem.show = True
+        plotitem.plot_var = geoplot.topo
+        plotitem.contour_levels = [0.0]
+        plotitem.amr_contour_colors = ['k']  # color on each level
+        plotitem.kwargs = {'linestyles':'solid','linewidths':2}
+        plotitem.amr_contour_show = [1]
+        plotitem.celledges_show = 0
+        plotitem.patchedges_show = 0
+
+
+        plotaxes.afteraxes = add_deformation_plots
 
     # =======================
     #  Figure for Bathymetry
     # =======================
     plotfigure = plotdata.new_plotfigure(name="Bathymetry")
-    plotfigure.show = True
+    plotfigure.show = False
 
     plotaxes = plotfigure.new_plotaxes()
     plotaxes.xlimits = xlimits
@@ -328,8 +387,8 @@ def setplot(plotdata):
     plotitem.plot_var = gaugetopo
     plotitem.plotstyle = 'g-'
 
-    def add_zeroline(current_data):
-        from pylab import plot, legend, xticks, floor
+    def gauge_afteraxes(current_data):
+        from pylab import plot, xticks, floor
         t = current_data.t
         #legend(('surface','topography'),loc='lower left')
         plot(t, 0*t, 'k')
@@ -338,7 +397,11 @@ def setplot(plotdata):
         plt.xlabel("t (s)")
         plt.ylabel("Surface (m)")
 
-    plotaxes.afteraxes = add_zeroline
+        if current_data.gaugeno == 4:
+            # Add gauge observations
+            plot(gauge_data[:,0] * 60.0, gauge_data[:,1], 'x')
+
+    plotaxes.afteraxes = gauge_afteraxes
 
 
     #-----------------------------------------

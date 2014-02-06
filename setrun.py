@@ -119,12 +119,12 @@ def setrun(claw_pkg='geoclaw'):
     # Note that the time integration stops after the final output time.
     # The solution at initial time t0 is always written in addition.
 
-    clawdata.output_style = 2
+    clawdata.output_style = 1
 
     if clawdata.output_style==1:
         # Output nout frames at equally spaced times up to tfinal:
         hours = 4
-        output_per_hour = 2
+        output_per_hour = 4
         clawdata.num_output_times = hours * output_per_hour
         clawdata.tfinal = float(hours) * 3600.0
         clawdata.output_t0 = True  # output at initial (or restart) time?
@@ -441,16 +441,16 @@ def setgeo(rundata):
     #    [topotype, minlevel, maxlevel, t1, t2, fname]
     topo_data.topofiles.append([3, 1, 5, 0., 1.e10, 
                           os.path.abspath('./bathy/mexican_coast_pacific.tt3')])
-    topo_data.topofiles.append([3, 1, 7, 0., 1.e10, 
+    topo_data.topofiles.append([3, 5, 7, 0., 1.e10, 
                           os.path.abspath('./bathy/acapulco_projected_30m.tt3')])
-    topo_data.topofiles.append([3, 1, 10, 0., 1.e10, 
-                          os.path.abspath('./bathy/srtm_subsection.tt3')])
+    # topo_data.topofiles.append([3, 1, 10, 0., 1.e10, 
+    #                       os.path.abspath('./bathy/srtm_subsection.tt3')])
 
     # == setdtopo.data values ==
     dtopo_data = rundata.dtopo_data
     # for moving topography, append lines of the form :   (<= 1 allowed for now!)
     #   [topotype, minlevel,maxlevel,fname]
-    dtopo_data.dtopofiles.append([1,3,5,'bathy/rot_gapSvr1zvT.xyzt'])
+    dtopo_data.dtopofiles.append([3,5,5,'bathy/okada_1957_du200.tt3'])
     # Note that if the run_faults.py script is used this is overriden there
 
 
