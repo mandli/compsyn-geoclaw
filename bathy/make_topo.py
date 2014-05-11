@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 import mpl_toolkits.basemap.pyproj as pyproj
 
-import clawpack.geoclaw.topo as topo
+# import clawpack.geoclaw.topo as topo
 import clawpack.geoclaw.topotools as topotools
 
 
@@ -21,12 +21,12 @@ def UTM2longlat(x, y, zone='14'):
 # Parameters
 # Output paths
 orig_bathy = "acapulco30m.xyz"
-out_bathy = "acapulco_projected_30m.tt3"
+out_bathy = "acapulco_projected_30m.tt2"
 fill_bathy = 'srtm_17_09.tt3'
 
 # Read in transform data
 print "Reading fine data..."
-orig_data = topo.Topography(orig_bathy, unstructured=True)
+orig_data = topotools.Topography(orig_bathy, unstructured=True)
 orig_data.x, orig_data.y = UTM2longlat(orig_data.x, orig_data.y)
 
 orig_data.z = - orig_data.z
@@ -34,7 +34,7 @@ print "Done."
 
 # Read in fill data
 print "Reading fill data..."
-fill_data = topo.Topography(fill_bathy)
+fill_data = topotools.Topography(fill_bathy)
 # Explicitly read in data to add filter
 fill_data.read(mask=True, filter_region=(-100.00041620659999, 
                                          -98.788687206402713,
@@ -56,7 +56,7 @@ orig_data.project_unstructured(fill_data.X, fill_data.Y, fill_data.Z,
 print "Done."
 
 print "Writing out data..."
-orig_data.write(out_bathy)
+orig_data.write(out_bathy, topo_type=2)
 fill_data.write('./srtm_subsection.tt3')
 print "Done."
 
@@ -103,5 +103,9 @@ axes.set_xlim(fill_data.extent[0:2])
 axes.set_ylim(fill_data.extent[2:])
 cbar = fig.colorbar(plot, ax=axes)
 cbar.set_label("Depth (m)")
+
+# Plot final topography
+acapulco_final_topo = topotools.Topography(out_bathy)
+acapulco_final_topo.plot()
 
 plt.show()
