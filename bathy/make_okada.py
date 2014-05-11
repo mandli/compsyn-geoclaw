@@ -2,13 +2,9 @@
 
 import sys
 
-import numpy
 import matplotlib.pyplot as plt
 
-import clawpack.geoclaw.okada2 as okada
-import clawpack.geoclaw.topo as topo
 import clawpack.geoclaw.dtopotools as dtopotools
-import clawpack.visclaw.colormaps as colormaps
 
 plot_fault = False
 if len(sys.argv) > 1:
@@ -29,7 +25,7 @@ if len(sys.argv) > 1:
 subfaults = []
 test_slips = [165, 200]
 for (n, slip) in enumerate(test_slips):
-    subfaults.append(topo.SubFault(units={"slip":"cm", "dimensions":"km", "depth":"km"}))
+    subfaults.append(dtopotools.SubFault(units={"slip":"cm", "dimensions":"km", "depth":"km"}))
     subfaults[-1].coordinates = [-99.25, 16.6]
     subfaults[-1].coordinate_specification = "top center"
     subfaults[-1].slip = slip
@@ -41,7 +37,7 @@ for (n, slip) in enumerate(test_slips):
     subfaults[-1].write('./okada_1957_du%s.tt3' % slip)
     
     print "Subfault Characteristics:"
-    print "  Mw = %s" % str(subfaults[-1].Mw(mu=5e11))
+    print "  Mw = %s" % str(subfaults[-1].Mw())
     print "  du = %s" % subfaults[-1].slip
     print "  Containing Rect = %s" % subfaults[-1].containing_rect()
 
@@ -52,6 +48,6 @@ if plot_fault:
         subfault.plot(axes)
         subfault.plot_fault_rect(axes, color='k')
         subfault.plot_rake(axes)
-        axes.set_title(r"$M_w = %s$, $\Delta u = %s$ cm" % (subfault.Mw(mu=5e11), 
+        axes.set_title(r"$M_w = %s$, $\Delta u = %s$ cm" % (subfault.Mw(), 
                                                             subfault.slip))
     plt.show()
