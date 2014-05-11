@@ -39,7 +39,6 @@ MODULES = \
  $(AMRLIB)/gauges_module.f90 \
  $(GEOLIB)/geoclaw_module.f90 \
  $(GEOLIB)/topo_module.f90 \
- $(GEOLIB)/dtopo_module.f90 \
  $(GEOLIB)/qinit_module.f90 \
  $(GEOLIB)/refinement_module.f90 \
  $(GEOLIB)/fixedgrids_module.f90 \
@@ -48,8 +47,8 @@ MODULES = \
 SOURCES = \
   $(GEOLIB)/setprob.f90 \
   $(GEOLIB)/qinit.f90 \
-  $(GEOLIB)/movetopo.f \
-  $(GEOLIB)/cellgridintegrate.f \
+  $(GEOLIB)/topo_update.f90 \
+  $(GEOLIB)/cellgridintegrate2.f \
   $(GEOLIB)/topointegral.f \
   $(GEOLIB)/bilinearintegral.f \
   $(GEOLIB)/stepgrid.f \
@@ -74,11 +73,6 @@ SOURCES = \
   $(GEOLIB)/flag2refine2.f90  \
   $(AMRLIB)/flagregions2.f90  \
   $(GEOLIB)/allowflag.f90  \
-  $(GEOLIB)/fgmax_read.f90 \
-  $(GEOLIB)/fgmax_frompatch.f90 \
-  $(GEOLIB)/fgmax_interpolate.f90 \
-  $(GEOLIB)/fgmax_values.f90 \
-  $(GEOLIB)/fgmax_finalize.f90 \
   $(GEOLIB)/b4step2.f90 \
   $(GEOLIB)/dumpgauge.f \
   $(GEOLIB)/upbnd.f  \
@@ -89,6 +83,11 @@ SOURCES = \
   $(GEOLIB)/getmaxspeed.f90 \
   $(GEOLIB)/advanc.f \
   $(GEOLIB)/amr2.f90 \
+  $(GEOLIB)/fgmax_read.f90 \
+  $(GEOLIB)/fgmax_frompatch.f90 \
+  $(GEOLIB)/fgmax_interpolate.f90 \
+  $(GEOLIB)/fgmax_values.f90 \
+  $(GEOLIB)/fgmax_finalize.f90 \
   $(AMRLIB)/quick_sort1.f \
   $(AMRLIB)/estdt.f \
   $(AMRLIB)/check4nans.f90 \
@@ -174,5 +173,3 @@ SOURCES = \
 #-------------------------------------------------------------------
 # Include Makefile containing standard definitions and make options:
 include $(CLAWMAKE)
-
-### DO NOT remove this line - make depends on it ###
