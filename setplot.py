@@ -38,7 +38,7 @@ import matplotlib.pyplot as plt
 from clawpack.visclaw import geoplot
 import clawpack.clawutil.data
 import clawpack.amrclaw.data
-import clawpack.geoclaw.topo as topo
+import clawpack.geoclaw.dtopotools as dtopo
 
 if not (sys.platform == 'darwin'):
     print "Switching to", plt.switch_backend('Agg')
@@ -58,7 +58,7 @@ except IOError:
 
 # Create subfault for plotting
 try:    
-    subfault = topo.SubFault(units={"slip":"cm", "dimensions":"km", "depth":"km"})
+    subfault = dtopo.SubFault(units={"slip":"cm", "dimensions":"km", "depth":"km"})
     subfault.coordinates = [-99.25, 16.6]
     subfault.coordinate_specification = "top center"
     subfault.slip = 200
