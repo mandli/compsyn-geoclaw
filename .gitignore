@@ -32,7 +32,24 @@ nosetests.xml
 # Mac
 .DS_Store
 
+# Zip Archives
+*.bz2
+
 # Clawpack data files
 *.data
 *.tt3
+*.tt2
+*.tt1
 *.xyzt
+
+# Figures
+*.gif
+
+# Latex 
+paper/*.aux
+paper/*.bbl
+paper/*.blg
+paper/*.fdb_latexmk
+paper/*.out
+paper/paper.pdf
+paper/*.spl
