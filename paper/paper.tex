@@ -47,8 +47,12 @@
 % Add line numbers
 \usepackage[mathlines]{lineno}
 
-% Commands 
-\include{commands}
+% Commands
+% Need to use this package to handle the spacing issues in LaTeX after a command
+\usepackage{xspace}
+\newcommand{\geoclaw}{{\sc GeoClaw}\xspace}
+\newcommand{\compsyn}{COMPSYN\xspace}
+\newcommand{\pd}[2]{\ensuremath{\frac{\partial #1}{\partial #2}}} % partial
 
 % Graphics
 % \DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
@@ -108,7 +112,7 @@ tsunami \sep Guerrero Gap \sep fault mechanisms
   \item We finalize it with key results of our simulations.
 \end{itemize}
 
-\section{Introduction}
+\section{Introduction} \label{sec:intro}
 
 \begin{itemize}
   \item Here we present a narrative of some of the most significant tsunamis (and their great damages) occurred  in the last century (e.g. those triggered by the Chile, 1960 and Alaska, 1964 earthquakes) and last decade  (Indonesia, 2004 and Japan, 2011) around the world.
@@ -123,7 +127,8 @@ tsunami \sep Guerrero Gap \sep fault mechanisms
 \end{itemize}
 
        
-\section{Tectonic framework and seismicity in the Guerrero Seismic Gap}
+\section{Tectonic framework and seismicity in the Guerrero Seismic Gap} \label{sec:tectonic_guerrero_gap}
+\emph{Maybe this could be in the intro as a review of our understanding of the area?}
 
 \begin{itemize}
   \item A description of the tectonic framework of the area.
@@ -131,24 +136,32 @@ tsunami \sep Guerrero Gap \sep fault mechanisms
   \item A detailed description of the seismicity of the area indicating the largest events occurred about 100 years ago (with the hypothesis of the expected Mw 8.2 earthquake in the gap), as well as the recent activity of March and April, 2014 in Petatlan, Guerrero.
 \end{itemize}
 
-\section{Data}
+\section{Data} \label{sec:data}
 
 A detailed description of the resolution of the data we use in our study, including their sources (organizations).
 \begin{itemize}
   \item Topography
+  \begin{itemize}
+    \item SRTM
+    \item GEBCO data
+    \item Private source
+  \end{itemize}
   \item Bathymetry
+  \begin{itemize}
+    \item GEBCO
+    \item Private source
+  \end{itemize}
   \item Tide gauge recordings
 \end{itemize}
 
-\section{Method}
- 
-\begin{itemize}
-  \item A description about COMPSYN and configuration of seismic stations around the fault plane (shown in a clear figure) where we obtain the displacement.
-  \item A description about GeoClaw, the incorporation of sea-floor deformation, topography and bathymetry, and how AMR works.
-   \item A small description about pros and cons of Okada's model.
-\end{itemize}
+\section{Method} \label{sec:method}
 
-\subsection{\geoclaw}
+\subsection{\compsyn} \label{sub:compsyn}
+\emph{A description about \compsyn and configuration of seismic stations around the fault plane (shown in a clear figure) where we obtain the displacement.}
+
+\subsection{\geoclaw} \label{sub:geoclaw}
+
+\emph{A description about GeoClaw, the incorporation of sea-floor deformation, topography and bathymetry, and how AMR works.}
 
 We utilized the \geoclaw package for performing all forward model runs.  \geoclaw uses a finite volume, wave-propagation approach to solve the two-dimensional nonlinear shallow water equations
 \begin{equation} \label{eq:swe}
@@ -158,7 +171,7 @@ We utilized the \geoclaw package for performing all forward model runs.  \geocla
     &\pd{}{t} (hv) + \pd{}{x} (huv) + \pd{}{y} \left (hv^2 + \frac{1}{2} gh^2 \right) = -fhu - gh \pd{}{y} b - C_f |\vec{u}| hv
     \end{aligned}
 \end{equation}
-where $h$ is the depth of the water column, $u$ and $v$ the velocities in the longitudinal and latitudinal directions respectively, $g$ the acceleration due to gravity, $b$ the bathymetry, $f$ the Coriolis parameter, and $C_f$ the bottom friction coefficient.  As is common in tsunami modeling, $C_f$ is calculated given a Manning's $n$ parameterization such that
+where $h$ is the depth of the water column, $u$ and $v$ the velocities in the longitudinal and latitudinal directions respectively, $g$ the acceleration due to gravity, $b$ the bathymetry, $f$ the Coriolis parameter, and $C_f$ the bottom friction coefficient determined by a Manning's $n$ parameterization such that
 \begin{equation}
     C_f = \frac{g n^2}{h^{5/3}}
 \end{equation}
@@ -166,7 +179,9 @@ where $n$ is an empirically determined parameter.
 
 The primary computational kernel in \geoclaw is the evaluation of the solution to the Riemann problem at each grid cell interface.  The Riemann solver used includes the ability to handle inundation (wet-dry interfaces), well-balancing even when the momentum is non-zero, and entropy corrections \cite{George:2008aa}.
 
-\subsubsection{Fault Movement Handling}
+\emph{Need to add discussion of AMR here}
+
+\subsubsection{Fault Movement Handling} \label{ssub:fault_movement}
 
 Fault movement in \geoclaw is handled differently depending on the type of movement specified.  At its simplest, a single deformation from the original bathymetry is specified and at the beginning of the simulation the bathymetry and therefore the surface is deformed accordingly (see Figure~\ref{fig:fault_movement_diagram}).  If the fault is specified with a temporal displacement, then a series of snapshots of the deformation are read in and the topography modified at the specified times.  In the case of the deformations presented, a final deformation was taken and linearly interpolated from $t=0$ to the end time at $5$ second intervals.
 
@@ -178,7 +193,12 @@ Fault movement in \geoclaw is handled differently depending on the type of movem
 %     \label{fig:fault_movement_diagram}
 % \end{figure}
 
-\section{Validation of our approach}
+\subsection{Okada Model} \label{sub:okada}
+
+\emph{A small description about pros and cons of Okada's model.}
+
+\section{Validation of our approach} \label{sec:validation}
+\emph{Maybe change this to a subsection?}
 \begin{itemize}
   \item In this section we consider the small tsunami (50 cm high) of the Petatlan earthquake (Mw 7.2; March 2014). 
   \item We use instantaneous displacement (Okada's approach) given its relatively small fault length (55 km).
@@ -186,9 +206,7 @@ Fault movement in \geoclaw is handled differently depending on the type of movem
   \item We show the fitting between simulated tsunami waveforms with the observed tide gauge recording at Acapulco.
 \end{itemize}
 
- 
-
-\section{Rupture models and sea-floor deformations}
+\section{Rupture models and sea-floor deformations} \label{sec:rupture_models}
 
 In this section we describe all rupture models and corresponding sea floor deformations for the Mw 8.2 earthquake. We begin with a simple deformations given by Okada's approach and then with those from the time-dependent approach. We show some figures indicating areas of the largest deformations which will help us to explain differences in inundation maps.
 
@@ -231,20 +249,20 @@ In this section we describe all rupture models and corresponding sea floor defor
   \item Alternatively, given that I got topography that includes infrastructure (hotels, houses, etc ...), we could incorporate more simulations (as those in 2 and 3) and compare them.
 \end{enumerate}
 
-\section{Tsunami simulations of the hypothetical Mw 8.2 earthquake in the Guerrero Gap}
+\section{Tsunami simulations of the hypothetical Mw 8.2 earthquake in the Guerrero Gap} \label{sec:guerrero_gap}
 \begin{itemize}
   \item Here we simulate tsunamis considering deformations mentioned above corresponding to the  hypothetical Mw 8.2 earthquake in the Guerrero Gap. 
   \item We show inundation maps as well as run-up heights for each case.
 \end{itemize}
 
-\section{Sensitivity analysis}
+\section{Sensitivity analysis} \label{sec:sensitivity}
 
 \begin{itemize}
   \item  In this section we analyze all inundation maps and run-up heights produced by the different sea floor deformations and explain differences in terms of rupture speed, hypocenter and location of the fault plane with respect to the trench. 
  \item We highlight the areas with largest inundation along the bay.
 \end{itemize}
 
-\section{Discussion}
+\section{Discussion} \label{sec:discussion}
 
 \begin{itemize}
   \item We discuss about our results, how they change depending on the involved parameters(depth of the top of the fault, hypocenter, rupture speed).
@@ -252,7 +270,7 @@ In this section we describe all rupture models and corresponding sea floor defor
   \item We definitely have to mention about the limitations of our approach. 
 
   \begin{enumerate}
-   \item COMPSYN fails for cases when the fault ruptures  the surface. We have to mention the necessity to conduct more realistic simulations (including dynamic ones) which consider rupture of the sea floor surface and their implications on the inundation maps. 
+   \item \compsyn fails for cases when the fault ruptures  the surface. We have to mention the necessity to conduct more realistic simulations (including dynamic ones) which consider rupture of the sea floor surface and their implications on the inundation maps. 
    \item We could consider other slip distributions (asperities) on the fault plane and check how they could affect the sea floor deformation.
    \item GeoClaw does not include a dispersive term, which could change significantly our results, specially near the source area.
    \item We can mention that our simulations consider a Manning friction coefficient of 0.025, but that inundation extension would change if we use different values.
@@ -260,7 +278,7 @@ In this section we describe all rupture models and corresponding sea floor defor
 
 \end{itemize}
   
-\section{Conclusions}
+\section{Conclusions} \label{sec:conclusions}
 
 \begin{itemize}
 \item Here we give a general description of our results highlighting mainly the areas that could be affected seriously. 
