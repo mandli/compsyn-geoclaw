@@ -13,6 +13,8 @@ import os
 
 import numpy
 
+import clawpack.geoclaw.dtopotools as dtopo
+
 #------------------------------
 def setrun(claw_pkg='geoclaw'):
 #------------------------------
@@ -119,12 +121,12 @@ def setrun(claw_pkg='geoclaw'):
     # Note that the time integration stops after the final output time.
     # The solution at initial time t0 is always written in addition.
 
-    clawdata.output_style = 1
+    clawdata.output_style = 2
 
     if clawdata.output_style==1:
         # Output nout frames at equally spaced times up to tfinal:
         hours = 4
-        output_per_hour = 4
+        output_per_hour = 12
         clawdata.num_output_times = hours * output_per_hour
         clawdata.tfinal = float(hours) * 3600.0
         clawdata.output_t0 = True  # output at initial (or restart) time?
@@ -338,6 +340,7 @@ def setrun(claw_pkg='geoclaw'):
     # Regions:
     # ---------------
     rundata.regiondata.regions = []
+    rundata.regiondata.regions.append([7,7,0.0,1e10, -99.930021, -99.830477, 16.780640, 16.870122])
     # to specify regions of refinement append lines of the form
     #  [minlevel,maxlevel,t1,t2,x1,x2,y1,y2]
     # Region                Long (E)            Lat (N)
@@ -425,7 +428,7 @@ def setgeo(rundata):
     geo_data.sea_level = 0.0
     geo_data.dry_tolerance = 1.e-3
     geo_data.friction_forcing = True
-    geo_data.manning_coefficient =.025
+    geo_data.manning_coefficient = 0.025
     geo_data.friction_depth = 1e6
 
     # Refinement settings
@@ -441,16 +444,32 @@ def setgeo(rundata):
     #    [topotype, minlevel, maxlevel, t1, t2, fname]
     topo_data.topofiles.append([3, 1, 5, 0., 1.e10, 
                           os.path.abspath('./bathy/mexican_coast_pacific.tt3')])
-    topo_data.topofiles.append([3, 5, 7, 0., 1.e10, 
-                          os.path.abspath('./bathy/acapulco_projected_30m.tt3')])
+    # topo_data.topofiles.append([3, 6, 7, 0., 1.e10, 
+    #                       os.path.abspath('./bathy/acapulco_projected_30m.tt2')])
+    topo_data.topofiles.append([2, 5, 7, 0., 1.e10, 
+                          os.path.abspath('./bathy/new_bathy/new_acapulco_bathy.tt2')])
+
     # topo_data.topofiles.append([3, 1, 10, 0., 1.e10, 
     #                       os.path.abspath('./bathy/srtm_subsection.tt3')])
 
     # == setdtopo.data values ==
     dtopo_data = rundata.dtopo_data
-    # for moving topography, append lines of the form :   (<= 1 allowed for now!)
+    # for moving topography, append lines of the form :
     #   [topotype, minlevel,maxlevel,fname]
-    dtopo_data.dtopofiles.append([3,5,5,'bathy/okada_1957_du200.tt3'])
+    dtopo_data.dtopofiles.append([1, 5, 5, 'bathy/rot_gapSvr1zvT.xyzt'])
+    #dtopo_data.dtopofiles.append([3, 5, 5, 'okada_1957Sm_du370.tt3'])
+    # subfault = dtopo.SubFault(units={"slip":"cm", "dimensions":"km", "depth":"km"})
+    # subfault.coordinates = [-99.25, 16.6]
+    # subfault.coordinate_specification = 'top center'
+    # subfault.slip = 200
+    # subfault.rake = 90.0
+    # subfault.strike = 296
+    # subfault.dip = 15.0
+    # subfault.depth = 4.0
+    # subfault.dimensions = (320.0, 80.0)
+    # subfault.my = 5e11
+    # subfault.write('./dtopo.tt3')
+    # dtopo_data.dtopofiles.append([3,5,5,'dtopo.tt3'])
     # Note that if the run_faults.py script is used this is overriden there
 
 
@@ -470,7 +489,7 @@ def setgeo(rundata):
     # == fgmax.data values ==
     fgmax_files = rundata.fgmax_data.fgmax_files
     # for fixed grids append to this list names of any fgmax input files
-    fgmax_files.append(os.path.abspath(os.path.join(os.getcwd(),'fgmax_grid.txt')))
+    # fgmax_files.append(os.path.abspath(os.path.join(os.getcwd(),'fgmax_grid.txt')))
 
     return rundata
     # end of function setgeo

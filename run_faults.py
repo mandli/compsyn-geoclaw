@@ -4,7 +4,7 @@ import os
 
 import batch
 
-import clawpack.geoclaw.okada2 as okada
+# import clawpack.geoclaw.okada2 as okada
 
 class FaultJob(batch.Job):
 
@@ -38,9 +38,9 @@ class FaultJob(batch.Job):
                 topo_type = 3
         self.rundata.dtopo_data.dtopofiles.append(
                                           [topo_type,3,5,self.deformation_file])
-        # Add earthquake to regions list
+        # Add earthquake to regions list, force refinement for 1 minute
         regions = self.rundata.regiondata.regions
-        regions.append([7, 7, 0.0, 1e10, -99.463937141374046, 
+        regions.append([7, 7, 0.0, 60e0, -99.463937141374046, 
                                          -98.485815563597853, 
                                           16.622495995962375, 
                                           17.490586994378546 ])
@@ -57,14 +57,13 @@ class FaultJob(batch.Job):
 
 if __name__ == '__main__':
 
-    # deformation_files = ["./bathy/rot_gapSzvT.xyzt",
-    #                      "./bathy/rot_gapSvr1zvT.xyzt", 
-    #                      "./bathy/rot_gapSvr2zvT.xyzt",
-    #                      "./bathy/rot_west_gapSzvT.xyzt",
-    #                      "./bathy/rot_west_gapSvr1zvT.xyzt", 
-    #                      "./bathy/rot_west_gapSvr2zvT.xyzt"]
-
-    deformation_files = ["./bathy/okada_1957_du165.tt3",
+    deformation_files = ["./bathy/rot_gapSzvT.xyzt",
+                         "./bathy/rot_gapSvr1zvT.xyzt", 
+                         "./bathy/rot_gapSvr2zvT.xyzt",
+                         "./bathy/rot_west_gapSzvT.xyzt",
+                         "./bathy/rot_west_gapSvr1zvT.xyzt", 
+                         "./bathy/rot_west_gapSvr2zvT.xyzt",
+                         "./bathy/okada_1957_du165.tt3",
                          "./bathy/okada_1957_du200.tt3"]
 
     tests = []

@@ -56,20 +56,6 @@ try:
 except IOError:
     pass
 
-# Create subfault for plotting
-try:    
-    subfault = dtopo.SubFault(units={"slip":"cm", "dimensions":"km", "depth":"km"})
-    subfault.coordinates = [-99.25, 16.6]
-    subfault.coordinate_specification = "top center"
-    subfault.slip = 200
-    subfault.rake = 90.0
-    subfault.strike = 296
-    subfault.dip = 25.0
-    subfault.depth = 12.0
-    subfault.dimensions = (90.0, 70.0)
-except:
-    subfault = None
-
 
 #--------------------------
 def setplot(plotdata):
@@ -91,7 +77,8 @@ def setplot(plotdata):
     regiondata.read('./regions.data')
     xlimits = (data.lower[0], data.upper[0])
     ylimits = (data.lower[1], data.upper[1])
-    surface_limit = 1.0
+    # surface_limit = 1.0
+    surface_limit = 2.0
     speed_limit = 1.0
 
     # To plot gauge locations on pcolor or contour plot, use this as
@@ -155,8 +142,8 @@ def setplot(plotdata):
         pylab.yticks(fontsize=15)
 
         # Plot fault plane
-        subfault.plot_fault_rect(pylab.gca())
-        subfault.plot_rake(pylab.gca())
+        # subfault.plot_fault_rect(pylab.gca())
+        # subfault.plot_rake(pylab.gca())
 
     plotaxes.afteraxes = fixup
 
@@ -202,12 +189,12 @@ def setplot(plotdata):
     # to be in the html versions or latex versions as these are just titles
     # region_names = [r'Acapulco', r"Acapulco Zoom"]
     #regiondata.regions.append([1,10,0.0,1e10,-99.9,-99.8516,16.7728,16.8589])
-    regiondata.regions.append([1, 10, 0.0, 1e10, 
-                      -99.9364923773, -99.80, 16.7714776209, 16.86007248])
-    regiondata.regions.append([1, 10, 0.0, 1e10, 
-                      -99.9797, -99.8335, 16.72, 16.876])
-    regiondata.regions.append([1, 10, 0.0, 1e10, 
-                      -99.9119, -99.8961, 16.8366, 16.8511])
+    # regiondata.regions.append([1, 10, 0.0, 1e10, 
+    #                   -99.9364923773, -99.80, 16.7714776209, 16.86007248])
+    # regiondata.regions.append([1, 10, 0.0, 1e10, 
+    #                   -99.9797, -99.8335, 16.72, 16.876])
+    # regiondata.regions.append([1, 10, 0.0, 1e10, 
+    #                   -99.9119, -99.8961, 16.8366, 16.8511])
     for (n,region) in enumerate(regiondata.regions):
         plotfigure = plotdata.new_plotfigure()#name='Surface Zoom of %s' % region_names[n])
 
@@ -307,34 +294,34 @@ def setplot(plotdata):
     # =================================
     #  Plot Deformation with Coastline
     # =================================
-    plotfigure = plotdata.new_plotfigure(name="Deformation")
-    plotfigure.show = (subfault is not None)
+    # plotfigure = plotdata.new_plotfigure(name="Deformation")
+    # plotfigure.show = (subfault is not None)
 
-    def add_deformation_plots(cd):
-        axes = plt.gca()
-        subfault.plot(axes, contours=[0.02, 0.15, 0.50])
-        subfault.plot_fault_rect(axes)
-        subfault.plot_rake(axes)
+    # def add_deformation_plots(cd):
+    #     axes = plt.gca()
+    #     subfault.plot(axes, contours=[0.02, 0.15, 0.50])
+    #     subfault.plot_fault_rect(axes)
+    #     subfault.plot_rake(axes)
 
-    if subfault is not None:
-        plotaxes = plotfigure.new_plotaxes()
-        plotaxes.xlimits = [subfault.x[0], subfault.x[-1]]
-        plotaxes.ylimits = [subfault.y[0], subfault.y[-1]]
-        plotaxes.title = "Subfault Deformation"
-        plotaxes.scaled = True
+    # if subfault is not None:
+    #     plotaxes = plotfigure.new_plotaxes()
+    #     plotaxes.xlimits = [subfault.x[0], subfault.x[-1]]
+    #     plotaxes.ylimits = [subfault.y[0], subfault.y[-1]]
+    #     plotaxes.title = "Subfault Deformation"
+    #     plotaxes.scaled = True
     
-        plotitem = plotaxes.new_plotitem(plot_type='2d_contour')
-        plotitem.show = True
-        plotitem.plot_var = geoplot.topo
-        plotitem.contour_levels = [0.0]
-        plotitem.amr_contour_colors = ['k']  # color on each level
-        plotitem.kwargs = {'linestyles':'solid','linewidths':2}
-        plotitem.amr_contour_show = [1]
-        plotitem.celledges_show = 0
-        plotitem.patchedges_show = 0
+    #     plotitem = plotaxes.new_plotitem(plot_type='2d_contour')
+    #     plotitem.show = True
+    #     plotitem.plot_var = geoplot.topo
+    #     plotitem.contour_levels = [0.0]
+    #     plotitem.amr_contour_colors = ['k']  # color on each level
+    #     plotitem.kwargs = {'linestyles':'solid','linewidths':2}
+    #     plotitem.amr_contour_show = [1]
+    #     plotitem.celledges_show = 0
+    #     plotitem.patchedges_show = 0
 
 
-        plotaxes.afteraxes = add_deformation_plots
+    #     plotaxes.afteraxes = add_deformation_plots
 
     # =======================
     #  Figure for Bathymetry

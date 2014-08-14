@@ -164,6 +164,8 @@ class Topography(object):
         self._extent = None
         self._delta = None
 
+        self.coordinate_transform = lambda x,y: (x,y)
+
 
     def read(self, mask=True, filter_region=None):
         r"""
@@ -505,10 +507,11 @@ class Topography(object):
         extent_mask = numpy.logical_or(extent_mask,extent[1] < X_fill)
         extent_mask = numpy.logical_or(extent_mask,extent[2] > Y_fill)
         extent_mask = numpy.logical_or(extent_mask,extent[3] < Y_fill)
+        all_mask = numpy.logical_or(extent_mask, Z_fill == no_data_value)
 
-        X_fill_mask = numpy.ma.masked_where(extent_mask,X_fill)
-        Y_fill_mask = numpy.ma.masked_where(extent_mask,Y_fill)
-        Z_fill_mask = numpy.ma.masked_where(extent_mask,Z_fill,no_data_value)
+        X_fill_mask = numpy.ma.masked_where(all_mask,X_fill)
+        Y_fill_mask = numpy.ma.masked_where(all_mask,Y_fill)
+        Z_fill_mask = numpy.ma.masked_where(all_mask,Z_fill,no_data_value)
 
         fill_points = numpy.column_stack((X_fill_mask.compressed(),
                                        Y_fill_mask.compressed()))
@@ -603,15 +606,16 @@ def read(path, topo_type=3, mask=True):
 
     return X,Y,Z
 
-def plot(path, region_extent=None, contours=None, coastlines=True, 
+def plot(path, axes=None, region_extent=None, contours=None, coastlines=True, 
                                      limits=None, cmap=plt.get_cmap('terrain')):
     r"""Plot the bathymetry file at path.
 
     Returns an axes instance.
     """
 
-    fig = plt.figure()
-    axes = fig.add_subplot(111)
+    if axes is None:
+        fig = plt.figure()
+        axes = fig.add_subplot(111)
     
     plt.ticklabel_format(format="plain", useOffset=False)
 
@@ -642,7 +646,7 @@ def plot(path, region_extent=None, contours=None, coastlines=True,
     else:
         plot = axes.imshow(Z, vmin=depth_extent[0], vmax=depth_extent[1],
                          extent=region_extent, cmap=cmap, norm=color_norm)
-    cbar = fig.colorbar(plot)
+    cbar = plt.colorbar(plot, ax=axes)
     cbar.set_label("Depth (m)")
     # levels = range(0,int(-numpy.min(Z)),500)
 
@@ -751,20 +755,19 @@ def extract(path,fill_path,extent,no_data_value=999999,plot_fill=False,
     if fill_extent[0] > extent[0] or fill_extent[1] < extent[1] or \
        fill_extent[2] > extent[2] or fill_extent[3] < extent[3]:
 
-       print " Fill Extent = %s" % str(fill_extent)
-       print " Requested Extent = %s" % str(extent)
-       raise Exception("Fill bathymetry extent does not contain extent.")
-
-
+        print " Fill Extent = %s" % str(fill_extent)
+        print " Requested Extent = %s" % str(extent)
+        raise Exception("Fill bathymetry extent does not contain extent.")
 
     extent_mask = extent[0] > X_fill
     extent_mask = numpy.logical_or(extent_mask,extent[1] < X_fill)
     extent_mask = numpy.logical_or(extent_mask,extent[2] > Y_fill)
     extent_mask = numpy.logical_or(extent_mask,extent[3] < Y_fill)
+    all_mask = numpy.logical_or(extent_mask, Z_fill == no_data_value)
 
-    X_fill_mask = numpy.ma.masked_where(extent_mask,X_fill)
-    Y_fill_mask = numpy.ma.masked_where(extent_mask,Y_fill)
-    Z_fill_mask = numpy.ma.masked_where(extent_mask,Z_fill,no_data_value)
+    X_fill_mask = numpy.ma.masked_where(all_mask,X_fill)
+    Y_fill_mask = numpy.ma.masked_where(all_mask,Y_fill)
+    Z_fill_mask = numpy.ma.masked_where(all_mask,Z_fill,no_data_value)
 
     fill_points = numpy.column_stack((X_fill_mask.compressed(),
                                    Y_fill_mask.compressed()))
@@ -780,10 +783,11 @@ def extract(path,fill_path,extent,no_data_value=999999,plot_fill=False,
         plt.show()
 
     # Interpolate known points onto regularized grid
-    print "Creating interpolating function..."
+    # print "Creating interpolating function..."
+    print "Interpolating data..."
     Z = griddata(points,values,(X,Y), method=method, fill_value=no_data_value)
 
-    return Z,delta
+    return X, Y, Z, delta
 
 
 def write(path,Z,lower,delta,no_data_value=999999,topotype=3):
