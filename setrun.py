@@ -428,7 +428,8 @@ def setgeo(rundata):
     geo_data.sea_level = 0.0
     geo_data.dry_tolerance = 1.e-3
     geo_data.friction_forcing = True
-    geo_data.manning_coefficient = 0.025
+    geo_data.manning_coefficient = [0.03, 0.025]
+    geo_data.manning_break = [0.0]
     geo_data.friction_depth = 1e6
 
     # Refinement settings

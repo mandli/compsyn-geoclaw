@@ -73,7 +73,7 @@ filter_region[1] += buffer_degrees
 # filter_region[2] = 16.8128
 filter_region[2] -= buffer_degrees
 filter_region[3] += buffer_degrees
-orig_data.project_unstructured(fill_paths, extent=filter_region, delta_limit=10.0)
+orig_data.interp_unstructured(fill_paths, extent=filter_region, delta_limit=10.0)
 print "Done."
 
 # print "Writing out data..."
